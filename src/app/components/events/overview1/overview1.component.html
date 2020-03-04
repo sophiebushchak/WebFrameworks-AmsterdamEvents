@@ -1,0 +1,29 @@
+<div class="row">
+  <h2>List of all events:</h2>
+  <table class="table">
+    <thead>
+    <tr>
+      <th scope="col">Title</th>
+      <th scope="col">Start</th>
+      <th scope="col">End</th>
+      <th scope="col">Status</th>
+      <th scope="col">Entrance Fee</th>
+      <th scope="col">Max Participants</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let aEvent of aEvents; let i = index">
+      <td>{{ aEvent.title }}-{{ i }}</td>
+      <td>{{ retrieveDate(aEvent.start) }}</td>
+      <td>{{ retrieveDate(aEvent.end) }}</td>
+      <td>{{ aEvent.status }}</td>
+      <td>
+        <span *ngIf="aEvent.isTicketed">€{{ aEvent.participationFee }}</span>
+        <span *ngIf="!aEvent.isTicketed">Free</span>
+      </td>
+      <td><span *ngIf="aEvent.isTicketed">{{ aEvent.maxParticipants }}</span></td>
+    </tr>
+    </tbody>
+  </table>
+  <button (click)="addRandomEvent()" class="btn btn-primary ml-auto">Add Event</button>
+</div>

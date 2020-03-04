@@ -1,0 +1,28 @@
+<div class="row">
+  <h2 class="ml-4">
+    Overview of all events:
+  </h2>
+</div>
+<div class="row">
+  <div class="col md-3">
+    <table class="table">
+      <thead class="thead-light">
+      <tr>
+        <th>Event Title</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let AEvent of aEvents; let i = index">
+          <td (click)="onSelected(AEvent)"> {{ AEvent.title }}-{{i}} </td>
+      </tr>
+      </tbody>
+    </table>
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-primary">Add Event</button>
+    </div>
+  </div>
+  <div class="col">
+      <app-detail2 ></app-detail2>
+  </div>
+</div>
+
