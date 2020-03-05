@@ -13,16 +13,28 @@
       </thead>
       <tbody>
       <tr *ngFor="let AEvent of aEvents; let i = index">
-          <td (click)="onSelected(AEvent)"> {{ AEvent.title }}-{{i}} </td>
+          <td [ngClass]="{'table-active': aEventSelected === AEvent}" (click)="onSelected(AEvent)">
+            <span *ngIf="AEvent.title != null; else noTitleYet" >{{ AEvent.title }}</span>
+            <ng-template #noTitleYet>
+                New Event
+            </ng-template>
+          </td>
       </tr>
       </tbody>
     </table>
     <div class="d-flex justify-content-end">
-      <button class="btn btn-primary">Add Event</button>
+      <button (click)="onAddEvent()" class="btn btn-primary">Add Event</button>
     </div>
   </div>
   <div class="col">
-      <app-detail2 ></app-detail2>
+      <app-detail2
+        (aEventDeleted)="onAEventDeleted($event)"
+        (aEventSaved)="onAEventSaved($event)"
+        [aEvent]="aEventSelected"
+        *ngIf="aEventSelected != null; else noEvent"></app-detail2>
+    <ng-template #noEvent>
+      <p>Select an event!</p>
+    </ng-template>
   </div>
 </div>
 

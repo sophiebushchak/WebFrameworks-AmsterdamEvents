@@ -6,33 +6,39 @@
   </thead>
   <tbody>
   <tr>
-    <th scope="row">Title:</th>
-    <td></td>
+    <th scope="row"><label for="title-input">Title:</label></th>
+    <td><input id="title-input" class="form-control"  [(ngModel)]="aEventCopy.title" type="text" placeholder="Enter title">
+    </td>
   </tr>
   <tr>
-    <th scope="row">Description:</th>
-    <td></td>
+    <th scope="row"><label for="description-input">Description:</label></th>
+    <td><input id="description-input" class="form-control"  [(ngModel)]="aEventCopy.description" type="text"
+               placeholder="Enter description"></td>
   </tr>
   <tr>
-    <th scope="row">Status:</th>
-    <td></td>
+    <th scope="row"><label for="status-input">Status:</label></th>
+    <td><select [(ngModel)]="aEventCopy.status" name="" id="status-input" class="form-control">
+      <option>DRAFT</option>
+      <option>PUBLISHED</option>
+      <option>CANCELLED</option>
+    </select></td>
   </tr>
   <tr>
-    <th scope="row">is Ticketed:</th>
-    <td></td>
+    <th scope="row"><label for="isticketed-input">Is Ticketed:</label></th>
+    <td><input  [(ngModel)]="aEventCopy.isTicketed" id="isticketed-input" type="checkbox" class="ml-4 form-check-input"></td>
   </tr>
   <tr>
-    <th scope="row">Participation fee:</th>
-    <td scope="row"></td>
+    <th scope="row"><label for="participationfee-input">Participation fee:</label></th>
+    <td><input  [(ngModel)]="aEventCopy.participationFee" [disabled]="!aEventCopy.isTicketed" placeholder="Enter a number" id="participationfee-input" type="number" class="form-control"></td>
   </tr>
   <tr>
-    <th>Maximum participants:</th>
-    <td></td>
+    <th scope="row"><label for="maxparticipants-input">Maximum participants:</label></th>
+    <td><input  [(ngModel)]="aEventCopy.maxParticipants" [disabled]="!aEventCopy.isTicketed" placeholder="Enter a number" id="maxparticipants-input" type="number" class="form-control"></td>
   </tr>
   </tbody>
 </table>
 <div class="d-flex justify-content-end">
-  <button class="btn btn-primary">Delete</button>
-  <button class="btn btn-primary ml-3">Save</button>
+  <button (click)="onDelete()" class="btn btn-primary">Delete</button>
+  <button (click)="onEventSaved()" class="btn btn-primary ml-3">Save</button>
 </div>
 

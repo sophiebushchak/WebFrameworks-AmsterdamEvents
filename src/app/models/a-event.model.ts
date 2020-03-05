@@ -8,7 +8,6 @@ export class AEvent {
   public start: Date;
   public end: Date;
 
-
   constructor(title: string, description: string, status: AEventStatus, isTicketed: boolean, participationFee: number,
               maxParticipants: number, start: Date, end: Date) {
     this.title = title;
