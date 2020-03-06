@@ -1,14 +1,14 @@
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {AEvent} from '../../../models/a-event.model';
 import {AEventsService} from '../../../services/a-events.service';
 import * as _ from 'lodash';
 
 @Component({
-  selector: 'app-overview3',
-  templateUrl: './overview3.component.html',
-  styleUrls: ['./overview3.component.css']
+  selector: 'app-overview4',
+  templateUrl: './overview4.component.html',
+  styleUrls: ['./overview4.component.css']
 })
-export class Overview3Component implements OnInit {
+export class Overview4Component implements OnInit {
   aEvents: AEvent[] = [];
   @Input() selectedAEventIndex: number;
 
@@ -35,7 +35,7 @@ export class Overview3Component implements OnInit {
 
   onAddEvent() {
     const newEvent = new AEvent(null, null, null, false, null, null, new Date(), null);
-    this.aEventsService.add(newEvent);
+    this.aEventsService.aEvents.push(newEvent);
     this.selectedAEventIndex = this.aEventsService.aEvents.indexOf(newEvent);
   }
 }

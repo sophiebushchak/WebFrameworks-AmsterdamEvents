@@ -12,6 +12,10 @@ import {FormsModule} from '@angular/forms';
 import { Detail3Component } from './components/events/detail3/detail3.component';
 import { Overview3Component } from './components/events/overview3/overview3.component';
 import {AEventsService} from './services/a-events.service';
+import {AppRoutingModule} from './app-routing-module.';
+import { ErrorComponent } from './components/mainpage/error/error.component';
+import { Overview4Component } from './components/events/overview4/overview4.component';
+import { Detail4Component } from './components/events/detail4/detail4.component';
 
 @NgModule({
   declarations: [
@@ -23,11 +27,15 @@ import {AEventsService} from './services/a-events.service';
     Overview2Component,
     Detail2Component,
     Detail3Component,
-    Overview3Component
+    Overview3Component,
+    ErrorComponent,
+    Overview4Component,
+    Detail4Component
   ],
   imports: [
     BrowserModule,
-    FormsModule
+    FormsModule,
+    AppRoutingModule
   ],
   providers: [AEventsService],
   bootstrap: [AppComponent]

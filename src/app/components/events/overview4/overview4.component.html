@@ -1,0 +1,37 @@
+<div class="row">
+  <h2 class="ml-4">
+    Overview of all events:
+  </h2>
+</div>
+<div class="row">
+  <div class="col md-3">
+    <table class="table">
+      <thead class="thead-light">
+      <tr>
+        <th>Event Title <span class="ml-auto">{{selectedAEventIndex}}</span></th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let AEvent of aEvents; let i = index">
+        <td [ngClass]="{'table-active': selectedAEventIndex === aEventsService.aEvents.indexOf(AEvent)}" (click)="onSelected(AEvent)">
+          <span *ngIf="AEvent.title != null; else noTitleYet" >{{ AEvent.title }}</span>
+          <ng-template #noTitleYet>
+            New Event
+          </ng-template>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+    <div class="d-flex justify-content-end">
+      <button (click)="onAddEvent()" class="btn btn-primary">Add Event</button>
+    </div>
+  </div>
+  <div class="col">
+    <app-detail3 [(editedAEventId)]="selectedAEventIndex"
+                 *ngIf="selectedAEventIndex != null; else noEvent"></app-detail3>
+    <ng-template #noEvent>
+      <p>Select an event!</p>
+    </ng-template>
+  </div>
+</div>
+
