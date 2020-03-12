@@ -13,7 +13,7 @@
     </thead>
     <tbody>
     <tr *ngFor="let aEvent of aEvents; let i = index">
-      <td>{{ aEvent.title }}-{{ i }}</td>
+      <td>{{ aEvent.title }}</td>
       <td>{{ retrieveDate(aEvent.start) }}</td>
       <td>{{ retrieveDate(aEvent.end) }}</td>
       <td>{{ aEvent.status }}</td>

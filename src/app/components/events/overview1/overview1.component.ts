@@ -20,6 +20,7 @@ export class Overview1Component implements OnInit {
   }
 
   addRandomEvent(): AEvent {
+    const defaultTitle = 'The Fantastic Event ' + this.aEvents.length;
     const status: AEventStatus = this.randomEnum();
     const isTicketed: boolean = Math.random() >= 0.5;
     let theParticipationFee: number;
@@ -35,7 +36,7 @@ export class Overview1Component implements OnInit {
       new Date(2019, 5, 13, 0, 0));
     const endDate: Date = this.randomDate(new Date(2019, 6, 14, 0, 0),
       new Date(2019, 6, 25, 0, 0));
-    const eventAdded: AEvent = new AEvent('The Fantastic Event', 'An event', status, isTicketed, theParticipationFee, theMaxParticipants,
+    const eventAdded: AEvent = new AEvent(defaultTitle, 'An event', status, isTicketed, theParticipationFee, theMaxParticipants,
       startDate, endDate);
     this.aEvents.push(eventAdded);
     return eventAdded;

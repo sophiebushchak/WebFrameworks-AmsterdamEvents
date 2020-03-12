@@ -13,8 +13,9 @@
       </thead>
       <tbody>
       <tr *ngFor="let AEvent of aEvents; let i = index">
-        <td [ngClass]="{'table-active': selectedAEventIndex === aEventsService.aEvents.indexOf(AEvent)}" (click)="onSelected(AEvent)">
-          <span *ngIf="AEvent.title != null; else noTitleYet" >{{ AEvent.title }}</span>
+        <td [ngClass]="{'table-active': isElementActive(i)}"
+            (click)="onSelected(i)">
+          <span *ngIf="AEvent.title != null; else noTitleYet">{{ AEvent.title }}</span>
           <ng-template #noTitleYet>
             New Event
           </ng-template>
@@ -27,8 +28,7 @@
     </div>
   </div>
   <div class="col">
-    <app-detail3 [(editedAEventId)]="selectedAEventIndex"
-                 *ngIf="selectedAEventIndex != null; else noEvent"></app-detail3>
+    <router-outlet *ngIf="selectedAEventIndex != null; else noEvent"></router-outlet>
     <ng-template #noEvent>
       <p>Select an event!</p>
     </ng-template>

@@ -1,38 +1,48 @@
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output} from '@angular/core';
 import {AEventsService} from '../../../services/a-events.service';
 import {AEvent} from '../../../models/a-event.model';
 import * as _ from 'lodash';
+import {ActivatedRoute, Params, Router} from '@angular/router';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'app-detail4',
   templateUrl: './detail4.component.html',
   styleUrls: ['./detail4.component.css']
 })
-export class Detail4Component implements OnInit, OnChanges {
-  @Input() editedAEventId: number;
-  @Output() editedAEventIdChange = new EventEmitter<number>();
+export class Detail4Component implements OnInit, OnDestroy {
+  public editedAEventId: number;
+  private queryParamsSubscription: Subscription = null;
 
-  constructor(public aEventsService: AEventsService) {
+  constructor(public aEventsService: AEventsService, private router: Router, private activatedRoute: ActivatedRoute) {
   }
 
   ngOnInit(): void {
+    console.log('detail4 init');
+    this.queryParamsSubscription =
+      this.activatedRoute.queryParams
+        .subscribe(
+          (params: Params) => {
+            console.log(params['id']);
+            this.editedAEventId = params['id'];
+            this.retrieveCopy(this.editedAEventId);
+          }
+        );
   }
 
-  ngOnChanges() {
-    this.retrieveCopy();
+  ngOnDestroy(): void {
+    this.queryParamsSubscription.unsubscribe();
   }
 
   onSave() {
     this.aEventsService.update(this.editedAEventId, this.aEventsService.aEventCopy);
-    this.editedAEventId = null;
-    this.editedAEventIdChange.emit(this.editedAEventId);
+    this.router.navigate(['../'], {relativeTo: this.activatedRoute});
   }
 
   onDelete() {
     if (confirm('Are you sure you want to delete this event?')) {
       this.aEventsService.remove(this.editedAEventId);
-      this.editedAEventId = null;
-      this.editedAEventIdChange.emit(this.editedAEventId);
+      this.router.navigate(['../'], {relativeTo: this.activatedRoute});
     }
   }
 
@@ -59,7 +69,7 @@ export class Detail4Component implements OnInit, OnChanges {
   onReset() {
     if (this.detectUnsavedChanges()) {
       if (confirm('Discard unsaved changes?')) {
-        this.retrieveCopy();
+        this.retrieveCopy(this.editedAEventId);
       }
     }
   }
@@ -67,12 +77,10 @@ export class Detail4Component implements OnInit, OnChanges {
   onCancel() {
     if (this.detectUnsavedChanges()) {
       if (confirm('Discard unsaved changes?')) {
-        this.editedAEventId = null;
-        this.editedAEventIdChange.emit(this.editedAEventId);
+        this.router.navigate(['../'], {relativeTo: this.activatedRoute});
       }
     } else {
-      this.editedAEventId = null;
-      this.editedAEventIdChange.emit(this.editedAEventId);
+      this.router.navigate(['../'], {relativeTo: this.activatedRoute});
     }
   }
 
@@ -80,11 +88,11 @@ export class Detail4Component implements OnInit, OnChanges {
     return (!_.isEqual(this.aEventsService.aEventCopy, this.aEventsService.aEvents[this.editedAEventId]));
   }
 
-  retrieveCopy() {
-    this.aEventsService.aEventCopy = new AEvent(this.aEventsService.aEvents[this.editedAEventId].title,
-      this.aEventsService.aEvents[this.editedAEventId].description, this.aEventsService.aEvents[this.editedAEventId].status,
-      this.aEventsService.aEvents[this.editedAEventId].isTicketed, this.aEventsService.aEvents[this.editedAEventId].participationFee,
-      this.aEventsService.aEvents[this.editedAEventId].maxParticipants, this.aEventsService.aEvents[this.editedAEventId].start,
-      this.aEventsService.aEvents[this.editedAEventId].end);
+  retrieveCopy(editedAEventId: number) {
+    this.aEventsService.aEventCopy = new AEvent(this.aEventsService.aEvents[editedAEventId].title,
+      this.aEventsService.aEvents[editedAEventId].description, this.aEventsService.aEvents[editedAEventId].status,
+      this.aEventsService.aEvents[editedAEventId].isTicketed, this.aEventsService.aEvents[editedAEventId].participationFee,
+      this.aEventsService.aEvents[editedAEventId].maxParticipants, this.aEventsService.aEvents[editedAEventId].start,
+      this.aEventsService.aEvents[editedAEventId].end);
   }
 }
