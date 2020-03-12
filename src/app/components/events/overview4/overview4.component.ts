@@ -29,7 +29,7 @@ export class Overview4Component implements OnInit, OnDestroy {
             this.selectedAEventIndex = params['id'];
           } else {
             this.selectedAEventIndex = null;
-            this.router.navigate(['/events/overview4']);
+            this.router.navigate(['./'], {relativeTo: this.activatedRoute});
           }
 
         });

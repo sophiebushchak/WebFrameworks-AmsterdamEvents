@@ -6,8 +6,8 @@ import {Overview2Component} from './components/events/overview2/overview2.compon
 import {Overview3Component} from './components/events/overview3/overview3.component';
 import {ErrorComponent} from './components/mainpage/error/error.component';
 import {Overview4Component} from './components/events/overview4/overview4.component';
-import {Detail3Component} from './components/events/detail3/detail3.component';
 import {Detail4Component} from './components/events/detail4/detail4.component';
+import {Detail42Component} from './components/events/detail42/detail42.component';
 
 const appRoutes: Routes = [
   {path: '', component: HomeComponent},
@@ -17,6 +17,10 @@ const appRoutes: Routes = [
   {path: 'events/overview3', component: Overview3Component},
   { path: 'events/overview4', component: Overview4Component, children: [
       {path: 'edit', component: Detail4Component}
+    ]
+  },
+  { path: 'events/overview42', component: Overview4Component, children: [
+      {path: 'edit', component: Detail42Component}
     ]
   },
   {path: 'not-found', component: ErrorComponent},

@@ -16,6 +16,7 @@ import {AppRoutingModule} from './app-routing-module.';
 import { ErrorComponent } from './components/mainpage/error/error.component';
 import { Overview4Component } from './components/events/overview4/overview4.component';
 import { Detail4Component } from './components/events/detail4/detail4.component';
+import { Detail42Component } from './components/events/detail42/detail42.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import { Detail4Component } from './components/events/detail4/detail4.component'
     Overview3Component,
     ErrorComponent,
     Overview4Component,
-    Detail4Component
+    Detail4Component,
+    Detail42Component
   ],
   imports: [
     BrowserModule,
