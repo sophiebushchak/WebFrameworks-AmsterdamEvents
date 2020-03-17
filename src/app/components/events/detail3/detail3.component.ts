@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output} from '@angular/core';
+import {Component, DoCheck, EventEmitter, Input, OnChanges, OnInit, Output} from '@angular/core';
 import {AEvent} from '../../../models/a-event.model';
 import {AEventsService} from '../../../services/a-events.service';
 import * as _ from 'lodash';
@@ -8,9 +8,10 @@ import * as _ from 'lodash';
   templateUrl: './detail3.component.html',
   styleUrls: ['./detail3.component.css']
 })
-export class Detail3Component implements OnInit, OnChanges {
+export class Detail3Component implements OnInit, OnChanges, DoCheck {
   @Input() editedAEventId: number;
   @Output() editedAEventIdChange = new EventEmitter<number>();
+  @Output() unsavedChanges = new EventEmitter<boolean>();
 
   constructor(public aEventsService: AEventsService) {
   }
@@ -20,6 +21,10 @@ export class Detail3Component implements OnInit, OnChanges {
 
   ngOnChanges() {
       this.retrieveCopy();
+  }
+
+  ngDoCheck() {
+    this.unsavedChanges.emit(this.detectUnsavedChanges());
   }
 
   onSave() {

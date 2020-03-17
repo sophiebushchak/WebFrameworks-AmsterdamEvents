@@ -28,7 +28,8 @@
     </div>
   </div>
   <div class="col">
-    <router-outlet *ngIf="selectedAEventIndex != null; else noEvent"></router-outlet>
+    <router-outlet *ngIf="selectedAEventIndex != null; else noEvent"
+                   (unsavedChanges)="detectUnsavedChanges($event)"></router-outlet>
     <ng-template #noEvent>
       <p>Select an event!</p>
     </ng-template>

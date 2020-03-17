@@ -14,6 +14,7 @@ export class Overview4Component implements OnInit, OnDestroy {
   aEvents: AEvent[] = [];
   selectedAEventIndex: number;
   private queryParamsSubscription: Subscription = null;
+  unsavedChanges: boolean;
 
   constructor(public aEventsService: AEventsService, private router: Router, private activatedRoute: ActivatedRoute) {
   }
@@ -41,7 +42,7 @@ export class Overview4Component implements OnInit, OnDestroy {
 
   onSelected(index: number) {
     if (this.selectedAEventIndex != null) {
-      if (!_.isEqual(this.aEventsService.aEventCopy, this.aEventsService.aEvents[this.selectedAEventIndex])) {
+      if (this.unsavedChanges) {
         if (confirm('Discard all changes?')) {
           this.router.navigate(['edit'], {relativeTo: this.activatedRoute, queryParams: {id: index}});
         }
@@ -57,6 +58,11 @@ export class Overview4Component implements OnInit, OnDestroy {
     const newEvent = new AEvent(null, null, null, false, null, null, new Date(), null);
     this.aEventsService.aEvents.push(newEvent);
     this.onSelected(this.aEventsService.aEvents.indexOf(newEvent));
+  }
+
+  detectUnsavedChanges(unsavedChanges: boolean) {
+    console.log('event received');
+    this.unsavedChanges = unsavedChanges;
   }
 
   isElementActive(index: number): boolean {

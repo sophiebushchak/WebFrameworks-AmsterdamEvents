@@ -1,26 +1,43 @@
 <h3>Selected event details: <span class="ml-auto">{{editedAEventId}}</span></h3>
-<form>
+<form (keydown.enter)="$event.preventDefault()" #eventForm="ngForm">
   <div class="form-group row">
     <label class="col-4 col-form-label" for="title-input">Title:</label>
     <div class="col">
-      <input id="title-input" class="form-control" [(ngModel)]="aEventsService.aEventCopy.title" type="text"
-             placeholder="Enter title">
+      <input
+        [ngModel]="aEventsService.aEvents[editedAEventId].title"
+        id="title-input"
+        name="title"
+        class="form-control"
+        type="text"
+        placeholder="Enter title"
+        required>
     </div>
   </div>
 
   <div class="form-group row">
     <label class="col-4 col-form-label" for="description-input">Description:</label>
     <div class="col">
-      <input id="description-input" class="form-control" [(ngModel)]="aEventsService.aEventCopy.description"
-             type="text"
-             placeholder="Enter description">
+      <input
+        id="description-input"
+        name="description"
+        class="form-control"
+        [ngModel]="aEventsService.aEvents[editedAEventId].description"
+        type="text"
+        placeholder="Enter description"
+        required
+        minlength="5">
     </div>
   </div>
 
   <div class="form-group row">
     <label class="col-4 col-form-label" for="status-input">Status:</label>
     <div class="col">
-      <select [(ngModel)]="aEventsService.aEventCopy.status" name="" id="status-input" class="form-control">
+      <select
+        [ngModel]="aEventsService.aEvents[editedAEventId].status"
+        name="status"
+        id="status-input"
+        class="form-control"
+        required>
         <option>DRAFT</option>
         <option>PUBLISHED</option>
         <option>CANCELLED</option>
@@ -31,8 +48,13 @@
   <div class="form-group row">
     <label class="col-4 col-form-label" for="isticketed-input">Is Ticketed:</label>
     <div id="isticketed-input-container" class="col">
-      <input [(ngModel)]="aEventsService.aEventCopy.isTicketed" id="isticketed-input" type="checkbox"
-             class="form-check-input">
+      <input
+        [ngModel]="aEventsService.aEvents[editedAEventId].isTicketed"
+        name="isTicketed"
+        id="isticketed-input"
+        type="checkbox"
+        class="form-check-input"
+      >
     </div>
   </div>
 
@@ -40,29 +62,47 @@
   <div class="form-group row">
     <label class="col-4 col-form-label" for="participationfee-input">Participation fee:</label>
     <div class="col">
-      <input [(ngModel)]="aEventsService.aEventCopy.participationFee"
-             [disabled]="!aEventsService.aEventCopy.isTicketed" placeholder="Enter a number"
-             id="participationfee-input" type="number" class="form-control">
+      <input
+        [ngModel]="aEventsService.aEvents[editedAEventId].participationFee"
+        name="participationFee"
+        placeholder="Enter a number"
+        id="participationfee-input"
+        type="number"
+        class="form-control"
+        pattern="^[0-9]*$"
+        [disabled]="!eventForm.value.isTicketed"
+        [required]="eventForm.value.isTicketed">
     </div>
   </div>
 
   <div class="form-group row">
     <label class="col-4 col-form-label" for="maxparticipants-input">Maximum participants:</label>
     <div class="col">
-      <input [(ngModel)]="aEventsService.aEventCopy.maxParticipants"
-             [disabled]="!aEventsService.aEventCopy.isTicketed" placeholder="Enter a number"
-             id="maxparticipants-input" type="number" class="form-control">
+      <input
+        [ngModel]="aEventsService.aEvents[editedAEventId].maxParticipants"
+        name="maxParticipants"
+        placeholder="Enter a number"
+        id="maxparticipants-input"
+        type="number"
+        class="form-control"
+        pattern="^[0-9]*$"
+        [disabled]="!eventForm.value.isTicketed"
+        [required]="eventForm.value.isTicketed">
     </div>
   </div>
 
   <div class="d-flex justify-content-end">
-    <button [disabled]="detectUnsavedChanges()" (click)="onDelete()" class="btn btn-primary">Delete</button>
-    <button [disabled]="!detectUnsavedChanges()" (click)="onSave()" class="btn btn-primary ml-3">Save</button>
+    <button [disabled]="this.eventForm.dirty" (click)="onDelete()" class="btn btn-primary">Delete</button>
+    <button [disabled]="this.eventForm.pristine || !eventForm.valid" (click)="onSave()" class="btn btn-primary ml-3">
+      Save
+    </button>
     <button (click)="onClear()" class="btn btn-primary ml-3">Clear</button>
-    <button [disabled]="!detectUnsavedChanges()" (click)="onReset()" class="btn btn-primary ml-3">Reset</button>
+    <button [disabled]="this.eventForm.pristine" (click)="onReset()" class="btn btn-primary ml-3">Reset</button>
     <button (click)="onCancel()" class="btn btn-primary ml-3">Cancel</button>
   </div>
 
+  <p id="formErrorText" class="mt-3" *ngIf="eventForm.invalid && eventForm.touched">Please fix the input errors in the
+    fields highlighted red.</p>
 </form>
 
 

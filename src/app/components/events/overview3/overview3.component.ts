@@ -11,6 +11,7 @@ import * as _ from 'lodash';
 export class Overview3Component implements OnInit {
   aEvents: AEvent[] = [];
   @Input() selectedAEventIndex: number;
+  unsavedChanges: boolean;
 
   constructor(public aEventsService: AEventsService) {
   }
@@ -21,7 +22,7 @@ export class Overview3Component implements OnInit {
 
   onSelected(aEvent: AEvent) {
     if (this.selectedAEventIndex != null) {
-      if (!_.isEqual(this.aEventsService.aEventCopy, this.aEventsService.aEvents[this.selectedAEventIndex])) {
+      if (this.unsavedChanges) {
         if (confirm('Discard all changes?')) {
           this.selectedAEventIndex = this.aEventsService.aEvents.indexOf(aEvent);
         }
@@ -31,6 +32,10 @@ export class Overview3Component implements OnInit {
     } else {
       this.selectedAEventIndex = this.aEventsService.aEvents.indexOf(aEvent);
     }
+  }
+
+  detectUnsavedChanges(unsavedChanges: boolean) {
+    this.unsavedChanges = unsavedChanges;
   }
 
   onAddEvent() {

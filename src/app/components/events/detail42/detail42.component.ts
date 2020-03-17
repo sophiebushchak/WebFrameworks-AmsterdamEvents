@@ -1,33 +1,41 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, DoCheck, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {AEventsService} from '../../../services/a-events.service';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {AEvent} from '../../../models/a-event.model';
 import * as _ from 'lodash';
+import {NgForm} from '@angular/forms';
 
 @Component({
   selector: 'app-detail42',
   templateUrl: './detail42.component.html',
   styleUrls: ['./detail42.component.css']
 })
-export class Detail42Component implements OnInit, OnDestroy {
+export class Detail42Component implements OnInit, OnDestroy, DoCheck {
+  @ViewChild('eventForm') eventForm: NgForm;
   public editedAEventId: number;
   private queryParamsSubscription: Subscription = null;
+  @Output() unsavedChanges = new EventEmitter<boolean>();
 
   constructor(public aEventsService: AEventsService, private router: Router, private activatedRoute: ActivatedRoute) {
-  }
-
-  ngOnInit(): void {
-    console.log('detail4 init');
     this.queryParamsSubscription =
       this.activatedRoute.queryParams
         .subscribe(
           (params: Params) => {
             console.log(params['id']);
             this.editedAEventId = params['id'];
-            this.retrieveCopy(this.editedAEventId);
+            if (this.eventForm != null) {
+              this.resetFieldsAndValidation();
+            }
           }
         );
+  }
+
+  ngOnInit(): void {
+  }
+
+  ngDoCheck() {
+    this.unsavedChanges.emit(this.detectUnsavedChanges());
   }
 
   ngOnDestroy(): void {
@@ -35,8 +43,19 @@ export class Detail42Component implements OnInit, OnDestroy {
   }
 
   onSave() {
-    this.aEventsService.update(this.editedAEventId, this.aEventsService.aEventCopy);
-    this.router.navigate(['../'], {relativeTo: this.activatedRoute});
+    this.aEventsService.aEvents[this.editedAEventId].title = this.eventForm.value.title;
+    this.aEventsService.aEvents[this.editedAEventId].description = this.eventForm.value.description;
+    this.aEventsService.aEvents[this.editedAEventId].status = this.eventForm.value.status;
+    this.aEventsService.aEvents[this.editedAEventId].isTicketed = this.eventForm.value.isTicketed;
+    if (this.eventForm.value.participationFee != null && this.eventForm.value.maxParticipants != null) {
+      this.aEventsService.aEvents[this.editedAEventId].participationFee = this.eventForm.value.participationFee;
+      this.aEventsService.aEvents[this.editedAEventId].maxParticipants = this.eventForm.value.maxParticipants;
+    } else {
+      this.aEventsService.aEvents[this.editedAEventId].participationFee = null;
+      this.aEventsService.aEvents[this.editedAEventId].maxParticipants = null;
+    }
+    console.log(this.aEventsService.aEvents[this.editedAEventId]);
+    this.resetFieldsAndValidation();
   }
 
   onDelete() {
@@ -49,27 +68,37 @@ export class Detail42Component implements OnInit, OnDestroy {
   onClear() {
     if (this.detectUnsavedChanges()) {
       if (confirm('Discard unsaved changes?')) {
-        this.aEventsService.aEventCopy.title = null;
-        this.aEventsService.aEventCopy.description = null;
-        this.aEventsService.aEventCopy.status = null;
-        this.aEventsService.aEventCopy.isTicketed = false;
-        this.aEventsService.aEventCopy.participationFee = null;
-        this.aEventsService.aEventCopy.maxParticipants = null;
+        this.eventForm.setValue(
+          {
+            title: null,
+            description: null,
+            status: null,
+            isTicketed: false,
+            participationFee: null,
+            maxParticipants: null
+          }
+        );
+        this.eventForm.form.markAsDirty();
       }
     } else {
-      this.aEventsService.aEventCopy.title = null;
-      this.aEventsService.aEventCopy.description = null;
-      this.aEventsService.aEventCopy.status = null;
-      this.aEventsService.aEventCopy.isTicketed = false;
-      this.aEventsService.aEventCopy.participationFee = null;
-      this.aEventsService.aEventCopy.maxParticipants = null;
+      this.eventForm.setValue(
+        {
+          title: null,
+          description: null,
+          status: null,
+          isTicketed: false,
+          participationFee: null,
+          maxParticipants: null
+        }
+      );
+      this.eventForm.form.markAsDirty();
     }
   }
 
   onReset() {
     if (this.detectUnsavedChanges()) {
       if (confirm('Discard unsaved changes?')) {
-        this.retrieveCopy(this.editedAEventId);
+        this.resetFieldsAndValidation();
       }
     }
   }
@@ -84,15 +113,24 @@ export class Detail42Component implements OnInit, OnDestroy {
     }
   }
 
-  detectUnsavedChanges(): boolean {
-    return (!_.isEqual(this.aEventsService.aEventCopy, this.aEventsService.aEvents[this.editedAEventId]));
+  resetFieldsAndValidation() {
+    this.eventForm.reset();
+    this.eventForm.setValue(
+      {
+        title: this.aEventsService.aEvents[this.editedAEventId].title,
+        description: this.aEventsService.aEvents[this.editedAEventId].description,
+        status: this.aEventsService.aEvents[this.editedAEventId].status,
+        isTicketed: this.aEventsService.aEvents[this.editedAEventId].isTicketed,
+        participationFee: this.aEventsService.aEvents[this.editedAEventId].participationFee,
+        maxParticipants: this.aEventsService.aEvents[this.editedAEventId].maxParticipants
+      }
+    );
   }
 
-  retrieveCopy(editedAEventId: number) {
-    this.aEventsService.aEventCopy = new AEvent(this.aEventsService.aEvents[editedAEventId].title,
-      this.aEventsService.aEvents[editedAEventId].description, this.aEventsService.aEvents[editedAEventId].status,
-      this.aEventsService.aEvents[editedAEventId].isTicketed, this.aEventsService.aEvents[editedAEventId].participationFee,
-      this.aEventsService.aEvents[editedAEventId].maxParticipants, this.aEventsService.aEvents[editedAEventId].start,
-      this.aEventsService.aEvents[editedAEventId].end);
+
+  detectUnsavedChanges(): boolean {
+    if (this.eventForm != null) {
+      return this.eventForm.dirty;
+    }
   }
 }

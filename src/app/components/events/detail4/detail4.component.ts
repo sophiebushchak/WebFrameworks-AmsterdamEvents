@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output} from '@angular/core';
+import {Component, DoCheck, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output} from '@angular/core';
 import {AEventsService} from '../../../services/a-events.service';
 import {AEvent} from '../../../models/a-event.model';
 import * as _ from 'lodash';
@@ -10,9 +10,10 @@ import {Subscription} from 'rxjs';
   templateUrl: './detail4.component.html',
   styleUrls: ['./detail4.component.css']
 })
-export class Detail4Component implements OnInit, OnDestroy {
+export class Detail4Component implements OnInit, OnDestroy, DoCheck {
   public editedAEventId: number;
   private queryParamsSubscription: Subscription = null;
+  @Output() unsavedChanges = new EventEmitter<boolean>();
 
   constructor(public aEventsService: AEventsService, private router: Router, private activatedRoute: ActivatedRoute) {
   }
@@ -30,9 +31,15 @@ export class Detail4Component implements OnInit, OnDestroy {
         );
   }
 
+  ngDoCheck() {
+    this.unsavedChanges.emit(this.detectUnsavedChanges());
+  }
+
   ngOnDestroy(): void {
     this.queryParamsSubscription.unsubscribe();
   }
+
+
 
   onSave() {
     this.aEventsService.update(this.editedAEventId, this.aEventsService.aEventCopy);
