@@ -35,7 +35,7 @@ export class Detail42Component implements OnInit, OnDestroy, DoCheck {
   }
 
   ngDoCheck() {
-    this.unsavedChanges.emit(this.detectUnsavedChanges());
+    this.aEventsService.editedChangesDetection.emit(this.detectUnsavedChanges());
   }
 
   ngOnDestroy(): void {

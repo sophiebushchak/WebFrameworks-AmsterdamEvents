@@ -13,7 +13,6 @@ import {Subscription} from 'rxjs';
 export class Detail4Component implements OnInit, OnDestroy, DoCheck {
   public editedAEventId: number;
   private queryParamsSubscription: Subscription = null;
-  @Output() unsavedChanges = new EventEmitter<boolean>();
 
   constructor(public aEventsService: AEventsService, private router: Router, private activatedRoute: ActivatedRoute) {
   }
@@ -32,7 +31,7 @@ export class Detail4Component implements OnInit, OnDestroy, DoCheck {
   }
 
   ngDoCheck() {
-    this.unsavedChanges.emit(this.detectUnsavedChanges());
+    this.aEventsService.editedChangesDetection.emit(this.detectUnsavedChanges());
   }
 
   ngOnDestroy(): void {

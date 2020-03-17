@@ -14,6 +14,7 @@ export class Overview4Component implements OnInit, OnDestroy {
   aEvents: AEvent[] = [];
   selectedAEventIndex: number;
   private queryParamsSubscription: Subscription = null;
+  private detectChangesSubscription: Subscription;
   unsavedChanges: boolean;
 
   constructor(public aEventsService: AEventsService, private router: Router, private activatedRoute: ActivatedRoute) {
@@ -34,6 +35,12 @@ export class Overview4Component implements OnInit, OnDestroy {
           }
 
         });
+    this.detectChangesSubscription =
+      this.aEventsService.editedChangesDetection.subscribe(
+        (value: boolean) => {
+          this.unsavedChanges = value;
+        }
+      );
   }
 
   ngOnDestroy(): void {

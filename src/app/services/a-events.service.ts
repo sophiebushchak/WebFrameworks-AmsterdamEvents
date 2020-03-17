@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 import {AEvent, AEventStatus} from '../models/a-event.model';
 
 @Injectable({
@@ -7,12 +7,17 @@ import {AEvent, AEventStatus} from '../models/a-event.model';
 export class AEventsService {
   public aEvents: AEvent[];
   public aEventCopy: AEvent;
+  public editedChangesDetection = new EventEmitter<boolean>();
 
   constructor() {
     this.aEvents = [];
     for (let i = 0; i < 9; i++) {
       this.addRandomEvent();
     }
+  }
+
+  detectChanges(status: boolean) {
+    this.editedChangesDetection.emit(status);
   }
 
   add(aEvent: AEvent): number {
