@@ -17,6 +17,10 @@ import { ErrorComponent } from './components/mainpage/error/error.component';
 import { Overview4Component } from './components/events/overview4/overview4.component';
 import { Detail4Component } from './components/events/detail4/detail4.component';
 import { Detail42Component } from './components/events/detail42/detail42.component';
+import { Overview6Component } from './components/events/overview6/overview6.component';
+import { Detail6Component } from './components/events/detail6/detail6.component';
+import {HttpClientModule} from '@angular/common/http';
+import {AEvents2Service} from './services/a-events2.service';
 
 @NgModule({
   declarations: [
@@ -32,14 +36,17 @@ import { Detail42Component } from './components/events/detail42/detail42.compone
     ErrorComponent,
     Overview4Component,
     Detail4Component,
-    Detail42Component
+    Detail42Component,
+    Overview6Component,
+    Detail6Component
   ],
   imports: [
     BrowserModule,
     FormsModule,
-    AppRoutingModule
+    AppRoutingModule,
+    HttpClientModule
   ],
-  providers: [AEventsService],
+  providers: [AEventsService, AEvents2Service],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

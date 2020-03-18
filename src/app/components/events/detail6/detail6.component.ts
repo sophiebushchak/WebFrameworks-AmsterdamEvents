@@ -1,28 +1,27 @@
-import {Component, DoCheck, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, DoCheck, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {NgForm} from '@angular/forms';
 import {Subscription} from 'rxjs';
 import {AEventsService} from '../../../services/a-events.service';
 import {ActivatedRoute, Params, Router} from '@angular/router';
-import {AEvent} from '../../../models/a-event.model';
-import * as _ from 'lodash';
-import {NgForm} from '@angular/forms';
+import {AEvents2Service} from '../../../services/a-events2.service';
 
 @Component({
-  selector: 'app-detail42',
-  templateUrl: './detail42.component.html',
-  styleUrls: ['./detail42.component.css']
+  selector: 'app-detail6',
+  templateUrl: './detail6.component.html',
+  styleUrls: ['./detail6.component.css']
 })
-export class Detail42Component implements OnInit, OnDestroy, DoCheck {
+export class Detail6Component implements OnInit, DoCheck, OnDestroy {
   @ViewChild('eventForm') eventForm: NgForm;
   public editedAEventId: number;
   private queryParamsSubscription: Subscription = null;
 
-  constructor(public aEventsService: AEventsService, private router: Router, private activatedRoute: ActivatedRoute) {
+  constructor(public aEventsService: AEvents2Service, private router: Router, private activatedRoute: ActivatedRoute) {
     this.queryParamsSubscription =
       this.activatedRoute.queryParams
         .subscribe(
           (params: Params) => {
-            console.log(params['id']);
             this.editedAEventId = params['id'];
+            console.log(this.aEventsService.aEvents[this.editedAEventId]);
             if (this.eventForm != null) {
               this.resetFieldsAndValidation();
             }
@@ -50,10 +49,11 @@ export class Detail42Component implements OnInit, OnDestroy, DoCheck {
       this.aEventsService.aEvents[this.editedAEventId].participationFee = this.eventForm.value.participationFee;
       this.aEventsService.aEvents[this.editedAEventId].maxParticipants = this.eventForm.value.maxParticipants;
     } else {
-      this.aEventsService.aEvents[this.editedAEventId].participationFee = null;
-      this.aEventsService.aEvents[this.editedAEventId].maxParticipants = null;
+      this.aEventsService.aEvents[this.editedAEventId].participationFee = 0;
+      this.aEventsService.aEvents[this.editedAEventId].maxParticipants = 0;
     }
     console.log(this.aEventsService.aEvents[this.editedAEventId]);
+    console.log(this.aEventsService.saveAllAEvents());
     this.resetFieldsAndValidation();
   }
 
@@ -73,8 +73,8 @@ export class Detail42Component implements OnInit, OnDestroy, DoCheck {
             description: null,
             status: null,
             isTicketed: false,
-            participationFee: null,
-            maxParticipants: null
+            participationFee: 0,
+            maxParticipants: 0
           }
         );
         this.eventForm.form.markAsDirty();
@@ -86,8 +86,8 @@ export class Detail42Component implements OnInit, OnDestroy, DoCheck {
           description: null,
           status: null,
           isTicketed: false,
-          participationFee: null,
-          maxParticipants: null
+          participationFee: 0,
+          maxParticipants: 0
         }
       );
       this.eventForm.form.markAsDirty();

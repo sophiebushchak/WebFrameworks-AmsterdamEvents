@@ -1,0 +1,40 @@
+/* Remove arrows from input type="number" */
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance:textfield;
+}
+
+#isticketed-input-container {
+  padding-top: 8px;
+  padding-left: 35px;
+}
+
+h3 {
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 0.75rem;
+  color: #495057;
+  background-color: #e9ecef;
+  border-color: #dee2e6;
+  border-top: 1px solid #dee2e6;
+  border-bottom: 2px solid #dee2e6;
+}
+
+select.ng-invalid, input.ng-invalid.ng-touched {
+  background: pink;
+}
+
+select.ng-valid.ng-touched, input.ng-valid.ng-touched {
+  background: lightgreen;
+}
+
+#formErrorText {
+  color: red;
+}
