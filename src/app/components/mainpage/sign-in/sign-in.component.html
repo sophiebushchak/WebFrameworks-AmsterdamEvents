@@ -1,0 +1,18 @@
+<div class="row justify-content-center">
+  <div class="col-6">
+    <form (ngSubmit)="onSignIn(form)" #form="ngForm">
+
+      <div class="form-group">
+        <label for="username">Email</label>
+        <input class="form-control" type="email" id="username" name="username" email required ngModel>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input class="form-control" type="password" id="password" name="password" required ngModel>
+      </div>
+      <button [disabled]="form.invalid" class="btn btn-primary" type="submit">Log In</button>
+
+    </form>
+  </div>
+</div>

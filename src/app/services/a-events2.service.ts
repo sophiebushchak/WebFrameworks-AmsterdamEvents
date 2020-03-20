@@ -3,37 +3,22 @@ import {AEvent, AEventStatus} from '../models/a-event.model';
 import {HttpClient} from '@angular/common/http';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
+import {SessionService} from './session-service';
 
 @Injectable({
   providedIn: 'root'
 })
+@Injectable()
 export class AEvents2Service {
-  @Output() aEventsEmit = new EventEmitter<AEvent[]>();
+  aEventsEmit = new EventEmitter<AEvent[]>();
   readonly dataStorageUrl: string;
   public aEvents: AEvent[];
-  public aEventCopy: AEvent;
   public editedChangesDetection = new EventEmitter<boolean>();
 
-  constructor(private httpClient: HttpClient) {
+  constructor(private httpClient: HttpClient, private sessionService: SessionService) {
     this.dataStorageUrl = 'https://amsterdam-events-601e5.firebaseio.com/';
     this.aEvents = [];
-    this.httpClient.get<AEvent[]>(this.dataStorageUrl + 'aEvents.json')
-      .subscribe(
-        (aEvents: AEvent[]) => {
-          if (aEvents != null) {
-            this.aEvents = aEvents;
-          } else {
-            for (let i = 0; i < 5; i++) {
-              this.addRandomEvent();
-            }
-            this.saveAllAEvents();
-          }
-          this.aEventsEmit.emit(this.aEvents);
-        },
-        (error) => {
-          console.log('error:' + error);
-        }
-      );
+    this.loadAllAEvents();
   }
 
   transmitAEvents() {
@@ -70,7 +55,33 @@ export class AEvents2Service {
         (aEvents: AEvent[]) => {
           console.log(aEvents);
         },
-        error => console.log(error)
+        (error) => {
+          if (error.status == 401) {
+            alert('You are not authorized. Please log in.');
+          } else {
+            alert(error.message);
+          }
+        }
+      );
+  }
+
+  loadAllAEvents() {
+    this.httpClient.get<AEvent[]>(this.dataStorageUrl + 'aEvents.json')
+      .subscribe(
+        (aEvents: AEvent[]) => {
+          if (aEvents != null && aEvents.length > 0) {
+            this.aEvents = aEvents;
+          } else {
+            for (let i = 0; i < 5; i++) {
+              this.addRandomEvent();
+            }
+            this.saveAllAEvents();
+          }
+          this.aEventsEmit.emit(this.aEvents);
+        },
+        (error) => {
+          alert(error.message);
+        }
       );
   }
 
@@ -93,7 +104,7 @@ export class AEvents2Service {
       new Date(2019, 6, 25, 0, 0));
     const eventAdded: AEvent = new AEvent(defaultTitle, 'An event', status, isTicketed, theParticipationFee, theMaxParticipants,
       startDate, endDate);
-    this.aEvents.push(eventAdded);
+    this.add(eventAdded);
     return eventAdded;
   }
 

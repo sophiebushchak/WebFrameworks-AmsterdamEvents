@@ -44,6 +44,7 @@ export class Overview6Component implements OnInit, OnDestroy {
           this.unsavedChanges = value;
         }
       );
+    this.aEventsService.loadAllAEvents();
     this.aEventsService.transmitAEvents();
   }
 

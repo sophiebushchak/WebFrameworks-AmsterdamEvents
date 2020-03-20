@@ -1,5 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './components/mainpage/header/header.component';
@@ -19,8 +20,13 @@ import { Detail4Component } from './components/events/detail4/detail4.component'
 import { Detail42Component } from './components/events/detail42/detail42.component';
 import { Overview6Component } from './components/events/overview6/overview6.component';
 import { Detail6Component } from './components/events/detail6/detail6.component';
-import {HttpClientModule} from '@angular/common/http';
 import {AEvents2Service} from './services/a-events2.service';
+import { AppFbComponent } from './app-fb/app-fb.component';
+import { Header2Component } from './components/mainpage/header2/header2.component';
+import {SessionService} from './services/session-service';
+import { SignInComponent } from './components/mainpage/sign-in/sign-in.component';
+import { NavBar2Component } from './components/mainpage/nav-bar2/nav-bar2.component';
+import {AuthInterceptor} from './auth-interceptor';
 
 @NgModule({
   declarations: [
@@ -38,7 +44,11 @@ import {AEvents2Service} from './services/a-events2.service';
     Detail4Component,
     Detail42Component,
     Overview6Component,
-    Detail6Component
+    Detail6Component,
+    AppFbComponent,
+    Header2Component,
+    SignInComponent,
+    NavBar2Component
   ],
   imports: [
     BrowserModule,
@@ -46,7 +56,11 @@ import {AEvents2Service} from './services/a-events2.service';
     AppRoutingModule,
     HttpClientModule
   ],
-  providers: [AEventsService, AEvents2Service],
-  bootstrap: [AppComponent]
+  providers: [AEventsService,
+    AEvents2Service,
+    SessionService,
+    {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true}
+  ],
+  bootstrap: [AppFbComponent]
 })
 export class AppModule { }

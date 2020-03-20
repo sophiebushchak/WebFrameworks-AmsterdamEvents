@@ -1,0 +1,13 @@
+
+header {
+  min-height: 150px;
+}
+
+img {
+  width: auto;
+  max-height: 135px;
+}
+
+#signedInUsername {
+  color: forestgreen;
+}
