@@ -11,6 +11,8 @@ import {Detail42Component} from './components/events/detail42/detail42.component
 import {Overview6Component} from './components/events/overview6/overview6.component';
 import {Detail6Component} from './components/events/detail6/detail6.component';
 import {SignInComponent} from './components/mainpage/sign-in/sign-in.component';
+import {Overview11Component} from './components/events2/overview11/overview11.component';
+import {Detail11Component} from './components/events2/detail11/detail11.component';
 
 const appRoutes: Routes = [
   {path: '', component: HomeComponent},
@@ -28,6 +30,10 @@ const appRoutes: Routes = [
   },
   { path: 'events/overview6', component: Overview6Component, children: [
       {path: 'edit', component: Detail6Component}
+    ]
+  },
+  { path: 'events/overview11', component: Overview11Component, children: [
+      {path: 'edit', component: Detail11Component}
     ]
   },
   {path: 'login', component: SignInComponent},

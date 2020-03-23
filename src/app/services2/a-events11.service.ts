@@ -3,7 +3,7 @@ import {AEvent, AEventStatus} from '../models/a-event.model';
 import {HttpClient} from '@angular/common/http';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
-import {SessionService} from './session-service';
+import {SessionService} from '../services/session-service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +15,7 @@ export class AEvents11Service {
   public editedChangesDetection = new EventEmitter<boolean>();
 
   constructor(private httpClient: HttpClient, private sessionService: SessionService) {
-    this.dataStorageUrl = 'https://amsterdam-events-601e5.firebaseio.com/';
+    this.dataStorageUrl = 'http://localhost:8084/aevents';
     this.aEvents = [];
     this.loadAllAEvents();
   }
@@ -49,7 +49,7 @@ export class AEvents11Service {
 
   saveAllAEvents() {
     console.log(this.aEvents);
-    this.httpClient.put<AEvent[]>(this.dataStorageUrl + 'aEvents.json', this.aEvents)
+    this.httpClient.put<AEvent[]>(this.dataStorageUrl, this.aEvents)
       .subscribe(
         (aEvents: AEvent[]) => {
           console.log(aEvents);
@@ -65,7 +65,7 @@ export class AEvents11Service {
   }
 
   loadAllAEvents() {
-    this.httpClient.get<AEvent[]>(this.dataStorageUrl + 'aEvents.json')
+    this.httpClient.get<AEvent[]>(this.dataStorageUrl)
       .subscribe(
         (aEvents: AEvent[]) => {
           if (aEvents != null && aEvents.length > 0) {

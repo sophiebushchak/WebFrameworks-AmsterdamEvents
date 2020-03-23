@@ -1,4 +1,9 @@
 package app.repositories;
 
-public class AEventsRepository {
+import models.AEvent;
+
+import java.util.List;
+
+public interface AEventsRepository {
+   List<AEvent> findAll();
 }

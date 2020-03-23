@@ -27,6 +27,9 @@ import {SessionService} from './services/session-service';
 import { SignInComponent } from './components/mainpage/sign-in/sign-in.component';
 import { NavBar2Component } from './components/mainpage/nav-bar2/nav-bar2.component';
 import {AuthInterceptor} from './auth-interceptor';
+import { Overview11Component } from './components/events2/overview11/overview11.component';
+import { Detail11Component } from './components/events2/detail11/detail11.component';
+import {AEvents11Service} from './services2/a-events11.service';
 
 @NgModule({
   declarations: [
@@ -48,7 +51,9 @@ import {AuthInterceptor} from './auth-interceptor';
     AppFbComponent,
     Header2Component,
     SignInComponent,
-    NavBar2Component
+    NavBar2Component,
+    Overview11Component,
+    Detail11Component
   ],
   imports: [
     BrowserModule,
@@ -59,8 +64,9 @@ import {AuthInterceptor} from './auth-interceptor';
   providers: [AEventsService,
     AEvents2Service,
     SessionService,
-    {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true}
-  ],
+    {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
+    AEvents11Service
+    ],
   bootstrap: [AppFbComponent]
 })
 export class AppModule { }

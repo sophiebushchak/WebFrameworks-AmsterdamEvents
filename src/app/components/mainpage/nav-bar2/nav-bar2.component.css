@@ -1,7 +1,3 @@
-#dropdown-registrations {
-  position: relative;
-}
-
-#dropdown-myevents {
+#dropdown-registrations, #dropdown-myevents, #dropdown-myevents2 {
   position: relative;
 }
