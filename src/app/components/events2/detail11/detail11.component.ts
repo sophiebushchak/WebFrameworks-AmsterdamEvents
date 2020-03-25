@@ -3,6 +3,7 @@ import {NgForm} from '@angular/forms';
 import {Subscription} from 'rxjs';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {AEvents11Service} from '../../../services2/a-events11.service';
+import {AEvent} from '../../../models2/a-event.model';
 
 @Component({
   selector: 'app-detail11',
@@ -12,6 +13,7 @@ import {AEvents11Service} from '../../../services2/a-events11.service';
 export class Detail11Component implements OnInit, DoCheck, OnDestroy {
   @ViewChild('eventForm') eventForm: NgForm;
   public editedAEventId: number;
+  public editedAEvent: AEvent;
   private queryParamsSubscription: Subscription = null;
 
   constructor(public aEventsService: AEvents11Service, private router: Router, private activatedRoute: ActivatedRoute) {
@@ -20,9 +22,21 @@ export class Detail11Component implements OnInit, DoCheck, OnDestroy {
         .subscribe(
           (params: Params) => {
             this.editedAEventId = params['id'];
-            console.log(this.aEventsService.aEvents[this.editedAEventId]);
+            this.editedAEvent = new AEvent(
+              this.aEventsService.aEvents[this.editedAEventId].id,
+              this.aEventsService.aEvents[this.editedAEventId].title,
+              this.aEventsService.aEvents[this.editedAEventId].description,
+              this.aEventsService.aEvents[this.editedAEventId].status,
+              this.aEventsService.aEvents[this.editedAEventId].isTicketed,
+              this.aEventsService.aEvents[this.editedAEventId].participationFee,
+              this.aEventsService.aEvents[this.editedAEventId].maxParticipants,
+              this.aEventsService.aEvents[this.editedAEventId].start,
+              this.aEventsService.aEvents[this.editedAEventId].end,
+            );
+            console.log(this.editedAEvent);
             if (this.eventForm != null) {
-              this.resetFieldsAndValidation();
+              this.eventForm.form.reset();
+              this.eventForm.form.patchValue(this.aEventsService.aEvents[this.editedAEventId]);
             }
           }
         );
@@ -40,26 +54,41 @@ export class Detail11Component implements OnInit, DoCheck, OnDestroy {
   }
 
   onSave() {
-    this.aEventsService.aEvents[this.editedAEventId].title = this.eventForm.value.title;
-    this.aEventsService.aEvents[this.editedAEventId].description = this.eventForm.value.description;
-    this.aEventsService.aEvents[this.editedAEventId].status = this.eventForm.value.status;
-    this.aEventsService.aEvents[this.editedAEventId].isTicketed = this.eventForm.value.isTicketed;
+    this.editedAEvent.title = this.eventForm.value.title;
+    this.editedAEvent.description = this.eventForm.value.description;
+    this.editedAEvent.status = this.eventForm.value.status;
+    this.editedAEvent.isTicketed = this.eventForm.value.isTicketed;
     if (this.eventForm.value.participationFee != null && this.eventForm.value.maxParticipants != null) {
-      this.aEventsService.aEvents[this.editedAEventId].participationFee = this.eventForm.value.participationFee;
-      this.aEventsService.aEvents[this.editedAEventId].maxParticipants = this.eventForm.value.maxParticipants;
+      this.editedAEvent.participationFee = this.eventForm.value.participationFee;
+      this.editedAEvent.maxParticipants = this.eventForm.value.maxParticipants;
     } else {
-      this.aEventsService.aEvents[this.editedAEventId].participationFee = 0;
-      this.aEventsService.aEvents[this.editedAEventId].maxParticipants = 0;
+      this.editedAEvent.participationFee = 0;
+      this.editedAEvent.maxParticipants = 0;
     }
-    console.log(this.aEventsService.aEvents[this.editedAEventId]);
-    console.log(this.aEventsService.saveAllAEvents());
-    this.resetFieldsAndValidation();
+    console.log(this.editedAEvent);
+    this.aEventsService.saveAEvent(this.editedAEvent, this.editedAEvent.id).subscribe(
+      () => {
+        this.aEventsService.update(this.editedAEventId, this.editedAEvent);
+        this.eventForm.form.reset();
+        this.eventForm.form.patchValue(this.aEventsService.aEvents[this.editedAEventId]);
+      },
+      (error) => {
+        alert(error.message);
+      }
+    );
   }
 
   onDelete() {
     if (confirm('Are you sure you want to delete this event?')) {
-      this.aEventsService.remove(this.editedAEventId);
-      this.router.navigate(['../'], {relativeTo: this.activatedRoute});
+      this.aEventsService.deleteAEvent(this.aEventsService.aEvents[this.editedAEventId].id).subscribe(
+        () => {
+          this.aEventsService.remove(this.editedAEventId);
+          this.router.navigate(['../'], {relativeTo: this.activatedRoute});
+        },
+        (error) => {
+          alert(error.message);
+        }
+      );
     }
   }
 
@@ -96,7 +125,8 @@ export class Detail11Component implements OnInit, DoCheck, OnDestroy {
   onReset() {
     if (this.detectUnsavedChanges()) {
       if (confirm('Discard unsaved changes?')) {
-        this.resetFieldsAndValidation();
+        this.eventForm.form.reset();
+        this.eventForm.form.patchValue(this.aEventsService.aEvents[this.editedAEventId]);
       }
     }
   }
@@ -111,24 +141,11 @@ export class Detail11Component implements OnInit, DoCheck, OnDestroy {
     }
   }
 
-  resetFieldsAndValidation() {
-    this.eventForm.reset();
-    this.eventForm.setValue(
-      {
-        title: this.aEventsService.aEvents[this.editedAEventId].title,
-        description: this.aEventsService.aEvents[this.editedAEventId].description,
-        status: this.aEventsService.aEvents[this.editedAEventId].status,
-        isTicketed: this.aEventsService.aEvents[this.editedAEventId].isTicketed,
-        participationFee: this.aEventsService.aEvents[this.editedAEventId].participationFee,
-        maxParticipants: this.aEventsService.aEvents[this.editedAEventId].maxParticipants
-      }
-    );
-  }
-
-
   detectUnsavedChanges(): boolean {
     if (this.eventForm != null) {
       return this.eventForm.dirty;
     }
   }
+
+
 }

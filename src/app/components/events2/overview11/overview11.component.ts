@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {AEvent} from '../../../models/a-event.model';
+import {AEvent} from '../../../models2/a-event.model';
 import {Subscription} from 'rxjs';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {AEvents11Service} from '../../../services2/a-events11.service';
@@ -68,9 +68,17 @@ export class Overview11Component implements OnInit, OnDestroy {
   }
 
   onAddEvent() {
-    const newEvent = new AEvent(null, null, null, false, 0, 0, new Date(), null);
-    this.aEvents.push(newEvent);
-    this.onSelected(this.aEvents.indexOf(newEvent));
+    const newEvent = new AEvent(null, null, null, null, false, 0, 0, new Date(), null);
+    this.aEventsService.postAEvent(newEvent).subscribe(
+      (updatedEvent: AEvent) => {
+        this.aEventsService.add(updatedEvent);
+        this.onSelected(this.aEvents.indexOf(updatedEvent));
+    },
+      (error) => {
+        alert(error.message);
+      }
+    );
+
   }
 
   isElementActive(index: number): boolean {

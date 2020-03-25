@@ -1,16 +1,24 @@
 package models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonView;
 import models.helper.AEventStatus;
+import models.helper.UserViews;
 
 import java.time.LocalDate;
 
 public class AEvent {
-  private static int nextId = 0;
-  private int id;
+  @JsonView(UserViews.OnlyIdTitleStatus.class)
+  private long id;
+
+  @JsonView(UserViews.OnlyIdTitleStatus.class)
   private String title;
+
   private String description;
+
+  @JsonView(UserViews.OnlyIdTitleStatus.class)
   private AEventStatus status;
+
   private boolean isTicketed;
   private double participationFee;
   private double maxParticipants;
@@ -18,7 +26,6 @@ public class AEvent {
   private LocalDate end;
 
   public AEvent() {
-    this.id = nextId++;
   }
 
   public AEvent(String title) {
@@ -26,8 +33,23 @@ public class AEvent {
     this.title = title;
   }
 
-  public int getId() {
+  public AEvent(String title, String description, AEventStatus status, boolean isTicketed, double participationFee, double maxParticipants, LocalDate start, LocalDate end) {
+    this(title);
+    this.description = description;
+    this.status = status;
+    this.isTicketed = isTicketed;
+    this.participationFee = participationFee;
+    this.maxParticipants = maxParticipants;
+    this.start = start;
+    this.end = end;
+  }
+
+  public long getId() {
     return id;
+  }
+
+  public void setId(long id) {
+    this.id = id;
   }
 
   public String getTitle() {
@@ -55,7 +77,7 @@ public class AEvent {
   }
 
 
-  @JsonProperty(value="isTicketed")
+  @JsonProperty(value = "isTicketed")
   public boolean isTicketed() {
     return isTicketed;
   }

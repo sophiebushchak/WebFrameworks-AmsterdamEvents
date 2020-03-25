@@ -9,8 +9,9 @@ export class AEvent {
   public start: Date;
   public end: Date;
 
-  constructor(title: string, description: string, status: AEventStatus, isTicketed: boolean, participationFee: number,
+  constructor(id: bigint, title: string, description: string, status: AEventStatus, isTicketed: boolean, participationFee: number,
               maxParticipants: number, start: Date, end: Date) {
+    this.id = id;
     this.title = title;
     this.description = description;
     this.status = status;
