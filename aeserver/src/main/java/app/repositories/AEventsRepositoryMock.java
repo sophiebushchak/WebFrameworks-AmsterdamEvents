@@ -1,10 +1,9 @@
 package app.repositories;
 
-import models.AEvent;
-import models.helper.AEventStatus;
+import app.models.AEvent;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -26,21 +25,21 @@ public class AEventsRepositoryMock implements AEventsRepository {
   }
 
   public AEvent save(AEvent aEvent) {
-    AEvent foundEvent;
     if (aEvent.getId() == 0) {
       this.aEvents.add(aEvent);
       aEvent.setId(10000 + ++nextId);
-      foundEvent = aEvent;
     } else {
-      foundEvent = aEvents.stream()
+      AEvent foundEvent = aEvents.stream()
         .filter(AEvent -> AEvent.getId() == aEvent.getId())
         .findFirst()
         .orElse(null);
       if (foundEvent != null) {
         aEvents.set(aEvents.indexOf(foundEvent), aEvent);
+      } else {
+        this.aEvents.add(aEvent);
       }
     }
-    return foundEvent;
+    return aEvent;
   }
 
   public boolean deleteById(long id) {
@@ -55,20 +54,5 @@ public class AEventsRepositoryMock implements AEventsRepository {
   public AEventsRepositoryMock(List<AEvent> aEvents) {
     this();
     this.aEvents = aEvents;
-  }
-
-  private AEvent generateRandomAEvent() {
-    AEvent newEvent = new AEvent();
-    newEvent.setTitle("A Random Event");
-    newEvent.setDescription("This event was randomly generated.");
-    newEvent.setStatus(AEventStatus.DRAFT);
-    newEvent.setTicketed(Math.random() > 0.5);
-    if (newEvent.isTicketed()) {
-      newEvent.setParticipationFee((Math.random() * 15) + 1);
-      newEvent.setParticipationFee((Math.random() * 2000) + 100);
-    }
-    newEvent.setStart(LocalDate.now());
-    newEvent.setEnd(LocalDate.of(2020, (int)(Math.random() * 6) + 5, 1));
-    return newEvent;
   }
 }

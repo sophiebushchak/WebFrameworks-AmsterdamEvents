@@ -1,6 +1,6 @@
 package app.repositories;
 
-import models.AEvent;
+import app.models.AEvent;
 
 import java.util.List;
 

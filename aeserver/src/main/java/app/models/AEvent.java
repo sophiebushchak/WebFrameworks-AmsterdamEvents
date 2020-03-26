@@ -1,14 +1,23 @@
-package models;
+package app.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
-import models.helper.AEventStatus;
-import models.helper.UserViews;
+import app.models.helper.AEventStatus;
+import app.models.helper.UserViews;
 
+import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
+@Entity
+@NamedQuery(name = "find_all_aevents", query = "SELECT e FROM AEvent e")
 public class AEvent {
   @JsonView(UserViews.OnlyIdTitleStatus.class)
+  @Id
+  @GeneratedValue
   private long id;
 
   @JsonView(UserViews.OnlyIdTitleStatus.class)
@@ -17,24 +26,24 @@ public class AEvent {
   private String description;
 
   @JsonView(UserViews.OnlyIdTitleStatus.class)
+  @Enumerated(EnumType.STRING)
   private AEventStatus status;
 
   private boolean isTicketed;
   private double participationFee;
-  private double maxParticipants;
+  private int maxParticipants;
   private LocalDate start;
   private LocalDate end;
+
+  @OneToMany(mappedBy = "associatedAEvent")
+  private List<Registration> registrations = new ArrayList<>();
 
   public AEvent() {
   }
 
-  public AEvent(String title) {
-    this();
+  public AEvent(String title, String description, AEventStatus status, boolean isTicketed, double participationFee,
+                int maxParticipants, LocalDate start, LocalDate end) {
     this.title = title;
-  }
-
-  public AEvent(String title, String description, AEventStatus status, boolean isTicketed, double participationFee, double maxParticipants, LocalDate start, LocalDate end) {
-    this(title);
     this.description = description;
     this.status = status;
     this.isTicketed = isTicketed;
@@ -42,6 +51,25 @@ public class AEvent {
     this.maxParticipants = maxParticipants;
     this.start = start;
     this.end = end;
+  }
+
+  public boolean addRegistration(Registration registration) {
+    if (registration == null || this.status != AEventStatus.PUBLISHED) {
+      return false;
+    }
+    this.registrations.add(registration);
+    registration.setAssociatedAEvent(this);
+    return true;
+  }
+
+  public void removeRegistration(Registration registration) {
+    this.registrations.remove(registration);
+    registration.setAssociatedAEvent(null);
+  }
+
+  @JsonIgnore
+  public List<Registration> getRegistrations() {
+    return registrations;
   }
 
   public long getId() {
@@ -98,7 +126,7 @@ public class AEvent {
     return maxParticipants;
   }
 
-  public void setMaxParticipants(double maxParticipants) {
+  public void setMaxParticipants(int maxParticipants) {
     this.maxParticipants = maxParticipants;
   }
 
@@ -116,5 +144,20 @@ public class AEvent {
 
   public void setEnd(LocalDate end) {
     this.end = end;
+  }
+
+  public static AEvent generateRandomAEvent() {
+    AEvent newEvent = new AEvent();
+    newEvent.setTitle("A Random Event");
+    newEvent.setDescription("This event was randomly generated.");
+    newEvent.setStatus(AEventStatus.values()[new Random().nextInt(AEventStatus.values().length)]);
+    newEvent.setTicketed(Math.random() > 0.5);
+    if (newEvent.isTicketed()) {
+      newEvent.setParticipationFee(Math.floor((Math.random() * 15) + 1));
+      newEvent.setMaxParticipants((int) (Math.floor(((Math.random() * 20) + 10)) * 10));
+    }
+    newEvent.setStart(LocalDate.now().plusDays(new Random().nextInt(7)));
+    newEvent.setEnd(LocalDate.now().plusDays(new Random().nextInt(7) + 7));
+    return newEvent;
   }
 }
