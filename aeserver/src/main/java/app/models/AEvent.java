@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import app.models.helper.AEventStatus;
 import app.models.helper.UserViews;
+import jdk.jfr.Name;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -14,7 +15,22 @@ import java.util.List;
 import java.util.Random;
 
 @Entity
-@NamedQuery(name = "find_all_aevents", query = "SELECT e FROM AEvent e")
+@NamedQueries(
+  {
+    @NamedQuery(
+      name="AEvent_find_by_status",
+      query = "SELECT e FROM AEvent e WHERE e.status = ?1"
+    ),
+    @NamedQuery(
+      name="AEvent_find_by_title",
+      query = "SELECT e FROM AEvent e WHERE lower(e.title) LIKE ?1"
+    ),
+    @NamedQuery(
+      name="AEvent_find_by_minRegistrations",
+      query = "SELECT e FROM AEvent e where SIZE(e.registrations) >= ?1"
+    )
+  }
+)
 public class AEvent implements Identifiable {
   @JsonView(UserViews.OnlyIdTitleStatus.class)
   @Id
@@ -36,7 +52,7 @@ public class AEvent implements Identifiable {
   private LocalDate start;
   private LocalDate end;
 
-  @OneToMany(mappedBy = "associatedAEvent")
+  @OneToMany(mappedBy = "associatedAEvent", fetch = FetchType.LAZY)
   private List<Registration> registrations = new ArrayList<>();
 
   public AEvent() {

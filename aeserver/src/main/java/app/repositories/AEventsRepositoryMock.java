@@ -13,10 +13,12 @@ public class AEventsRepositoryMock implements AEventsRepository {
   private List<AEvent> aEvents;
   private int nextId;
 
+  @Override
   public List<AEvent> findAll() {
     return this.aEvents;
   }
 
+  @Override
   public AEvent findById(long id) {
     return aEvents.stream()
       .filter(AEvent -> AEvent.getId() == id)
@@ -24,6 +26,7 @@ public class AEventsRepositoryMock implements AEventsRepository {
       .orElse(null);
   }
 
+  @Override
   public AEvent save(AEvent aEvent) {
     if (aEvent.getId() == 0) {
       this.aEvents.add(aEvent);
@@ -42,6 +45,7 @@ public class AEventsRepositoryMock implements AEventsRepository {
     return aEvent;
   }
 
+  @Override
   public boolean deleteById(long id) {
     Predicate<AEvent> condition = aEvent -> aEvent.getId() == id;
     return aEvents.removeIf(condition);

@@ -1,6 +1,7 @@
 package app.rest;
 
 import app.models.Registration;
+import app.models.helper.AEventStatus;
 import app.models.helper.StringGenerator;
 import app.repositories.interfaces.AEventsRepository;
 import app.repositories.RegistrationsRepositoryJPA;
@@ -15,11 +16,16 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class AEventsController {
@@ -29,13 +35,50 @@ public class AEventsController {
   @Autowired
   private EntityRepository<Registration> registrationsRepository;
 
-  @JsonView(UserViews.OnlyIdTitleStatus.class)
-  @GetMapping("/aevents")
-  public List<AEvent> getAllAEvents() {
-    return repository.findAll();
+
+  @RequestMapping(
+    value="/aevents",
+    method = RequestMethod.GET)
+  public List<AEvent> getAllAEvents(HttpServletRequest request) {
+    Map<String,String[]> params = request.getParameterMap();
+    if (params.size() == 0) {
+      return repository.findAll();
+    }
+    if (params.size() > 1) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can only handle one request parameter: title=, status= or minRegistrations=");
+    }
+    if (params.containsKey("title")) {
+      String value = params.get("title")[0];
+      return repository.findByQuery("AEvent_find_by_title", ("%" + value + "%"));
+    }
+    if (params.containsKey("status")) {
+      String stringValue = params.get("status")[0].toUpperCase();
+      for (AEventStatus e : AEventStatus.values()) {
+        if (e.name().equals(stringValue)) {
+          AEventStatus value = AEventStatus.valueOf(stringValue);
+          return repository.findByQuery("AEvent_find_by_status", value);
+        }
+      }
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "status=" + stringValue + " is not a valid AEvent status value.");
+    }
+    if (params.containsKey("minRegistrations")) {
+      int value;
+      try {
+        value = Integer.parseInt(params.get("minRegistrations")[0]);
+      } catch (NumberFormatException e) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Provided request parameter was not a valid number.");
+      }
+      return repository.findByQuery("AEvent_find_by_minRegistrations", value);
+    }
+    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid query parameters.");
   }
 
-  @GetMapping("aevents/{id}")
+/*  @GetMapping("/aevents")
+  public List<AEvent> getAllAEvents(@RequestParam(required = false) String title,
+                                    @RequestParam(required = false) AEventStatus status,
+                                    @RequestParam(required = false) int minRegistrations) {}*/
+
+  @GetMapping("/aevents/{id}")
   public AEvent getAEvent(@PathVariable int id) {
     AEvent foundEvent = repository.findById(id);
     if (foundEvent == null) {

@@ -61,5 +61,15 @@ public class AEServerApplication implements CommandLineRunner {
       }
     }
     System.out.println("Initial Registration data configured.");
+
+    System.out.println("Starting query tests:");
+    List<AEvent> publishedEvents = aEventRepo.findByQuery("AEvent_find_by_status", AEventStatus.PUBLISHED);
+    publishedEvents.forEach( (AEvent e) -> System.out.println("Event with id " + e.getId() + " has a status of PUBLISHED.") );
+
+    List<AEvent> randomEvents = aEventRepo.findByQuery("AEvent_find_by_title", "%" + "event" + "%");
+    randomEvents.forEach( (AEvent e) -> System.out.println("Event with id " + e.getId() + " has a title matching \"random\"") );
+
+    List<AEvent> minOneRegistrationEvents = aEventRepo.findByQuery("AEvent_find_by_minRegistrations", 1);
+    minOneRegistrationEvents.forEach( (AEvent e) -> System.out.println("Event with id " + e.getId() + " has at least one registration") );
   }
 }

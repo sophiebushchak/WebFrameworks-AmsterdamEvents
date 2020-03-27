@@ -24,9 +24,19 @@ public abstract class AbstractEntityRepositoryJPA<E extends Identifiable> implem
   }
 
   @Override
+  public List<E> findByQuery(String jpqlName, Object... params) {
+    TypedQuery<E> query = entityManager.createNamedQuery(jpqlName, theEntityClass);
+    for (int i = 0; i < params.length; i++) {
+      query.setParameter(i + 1, params[i]);
+    }
+    System.out.println(query);
+    return query.getResultList();
+  }
+
+  @Override
   public List<E> findAll() {
-    Query namedQuery = entityManager.createQuery("from " + theEntityClass.getSimpleName());
-    return namedQuery.getResultList();
+    Query query = entityManager.createQuery("from " + theEntityClass.getSimpleName());
+    return query.getResultList();
   }
 
   @Override
