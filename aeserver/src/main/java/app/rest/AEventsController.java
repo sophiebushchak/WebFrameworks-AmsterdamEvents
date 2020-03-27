@@ -36,11 +36,8 @@ public class AEventsController {
   private EntityRepository<Registration> registrationsRepository;
 
 
-  @RequestMapping(
-    value="/aevents",
-    method = RequestMethod.GET)
-  public List<AEvent> getAllAEvents(HttpServletRequest request) {
-    Map<String,String[]> params = request.getParameterMap();
+  @GetMapping("/aevents")
+  public List<AEvent> getAllAEvents(@RequestParam Map<String,String> params) {
     if (params.size() == 0) {
       return repository.findAll();
     }
@@ -48,11 +45,11 @@ public class AEventsController {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can only handle one request parameter: title=, status= or minRegistrations=");
     }
     if (params.containsKey("title")) {
-      String value = params.get("title")[0];
+      String value = params.get("title");
       return repository.findByQuery("AEvent_find_by_title", ("%" + value + "%"));
     }
     if (params.containsKey("status")) {
-      String stringValue = params.get("status")[0].toUpperCase();
+      String stringValue = params.get("status").toUpperCase();
       for (AEventStatus e : AEventStatus.values()) {
         if (e.name().equals(stringValue)) {
           AEventStatus value = AEventStatus.valueOf(stringValue);
@@ -64,7 +61,7 @@ public class AEventsController {
     if (params.containsKey("minRegistrations")) {
       int value;
       try {
-        value = Integer.parseInt(params.get("minRegistrations")[0]);
+        value = Integer.parseInt(params.get("minRegistrations"));
       } catch (NumberFormatException e) {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Provided request parameter was not a valid number.");
       }
