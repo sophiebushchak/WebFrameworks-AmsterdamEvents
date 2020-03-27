@@ -1,12 +1,13 @@
 package app.models;
 
+import app.models.helper.CustomJson;
 import app.models.interfaces.Identifiable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import app.models.helper.AEventStatus;
 import app.models.helper.UserViews;
-import jdk.jfr.Name;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -32,17 +33,14 @@ import java.util.Random;
   }
 )
 public class AEvent implements Identifiable {
-  @JsonView(UserViews.OnlyIdTitleStatus.class)
   @Id
   @GeneratedValue
   private long id;
 
-  @JsonView(UserViews.OnlyIdTitleStatus.class)
   private String title;
 
   private String description;
 
-  @JsonView(UserViews.OnlyIdTitleStatus.class)
   @Enumerated(EnumType.STRING)
   private AEventStatus status;
 
@@ -52,6 +50,8 @@ public class AEvent implements Identifiable {
   private LocalDate start;
   private LocalDate end;
 
+  @JsonView({CustomJson.Summary.class})
+  @JsonSerialize(using = CustomJson.ShallowSerializer.class)
   @OneToMany(mappedBy = "associatedAEvent", fetch = FetchType.LAZY)
   private List<Registration> registrations = new ArrayList<>();
 

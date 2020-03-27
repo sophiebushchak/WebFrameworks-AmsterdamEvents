@@ -70,11 +70,6 @@ public class AEventsController {
     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid query parameters.");
   }
 
-/*  @GetMapping("/aevents")
-  public List<AEvent> getAllAEvents(@RequestParam(required = false) String title,
-                                    @RequestParam(required = false) AEventStatus status,
-                                    @RequestParam(required = false) int minRegistrations) {}*/
-
   @GetMapping("/aevents/{id}")
   public AEvent getAEvent(@PathVariable int id) {
     AEvent foundEvent = repository.findById(id);
