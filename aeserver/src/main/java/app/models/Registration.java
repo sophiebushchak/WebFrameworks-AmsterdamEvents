@@ -1,11 +1,13 @@
 package app.models;
 
+import app.models.interfaces.Identifiable;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
 @NamedQuery(name = "find_all_registrations", query = "SELECT r FROM Registration r")
-public class Registration {
+public class Registration implements Identifiable {
   @Id
   @GeneratedValue
   private long id;

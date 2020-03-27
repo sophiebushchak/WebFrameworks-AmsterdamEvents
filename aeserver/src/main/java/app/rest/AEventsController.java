@@ -2,8 +2,9 @@ package app.rest;
 
 import app.models.Registration;
 import app.models.helper.StringGenerator;
-import app.repositories.AEventsRepository;
+import app.repositories.interfaces.AEventsRepository;
 import app.repositories.RegistrationsRepositoryJPA;
+import app.repositories.interfaces.EntityRepository;
 import app.rest.exceptions.ForregistrationdenException;
 import app.rest.exceptions.PreconditionFailedException;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -11,6 +12,7 @@ import app.models.AEvent;
 import app.models.helper.UserViews;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -22,10 +24,10 @@ import java.util.List;
 @RestController
 public class AEventsController {
   @Autowired
-  private AEventsRepository repository;
+  private EntityRepository<AEvent> repository;
 
   @Autowired
-  private RegistrationsRepositoryJPA registrationsRepository;
+  private EntityRepository<Registration> registrationsRepository;
 
   @JsonView(UserViews.OnlyIdTitleStatus.class)
   @GetMapping("/aevents")
@@ -48,13 +50,13 @@ public class AEventsController {
     if (aEvent.getId() != 0) {
       throw new ForregistrationdenException("AEvent-Id=" + aEvent.getId() + " must be 0.");
     }
-    AEvent savedEvent = repository.save(aEvent);
+    aEvent = repository.save(aEvent);
     URI location = ServletUriComponentsBuilder
       .fromCurrentRequest()
       .path("{id}")
-      .buildAndExpand(savedEvent.getId())
+      .buildAndExpand(aEvent.getId())
       .toUri();
-    return ResponseEntity.created(location).body(savedEvent);
+    return ResponseEntity.created(location).body(aEvent);
   }
 
   @RequestMapping(method = {RequestMethod.PUT, RequestMethod.POST}, path = "/aevents/{id}")
@@ -76,6 +78,7 @@ public class AEventsController {
     }
   }
 
+  @ResponseStatus(HttpStatus.CREATED)
   @PostMapping("/aevents/{id}/register")
   public Registration createNewRegistration(@RequestBody(required = false) LocalDateTime startDateTime, @PathVariable int id) {
     AEvent foundEvent = this.getAEvent(id);

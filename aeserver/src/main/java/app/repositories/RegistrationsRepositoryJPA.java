@@ -6,14 +6,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.util.List;
 
 @Repository
 @Transactional
-public class RegistrationsRepositoryJPA {
-  @Autowired
+public class RegistrationsRepositoryJPA extends AbstractEntityRepositoryJPA<Registration> {
+  public RegistrationsRepositoryJPA() {
+    super(Registration.class);
+  }
+}
+
+/*  @PersistenceContext
   EntityManager entityManager;
 
   public List<Registration> findAll() {
@@ -37,4 +43,4 @@ public class RegistrationsRepositoryJPA {
     entityManager.remove(registration);
     return true;
   }
-}
+}*/

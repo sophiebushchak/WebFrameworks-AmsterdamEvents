@@ -1,7 +1,7 @@
 package app.repositories;
 
 import app.models.AEvent;
-import org.springframework.context.annotation.Primary;
+import app.repositories.interfaces.AEventsRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

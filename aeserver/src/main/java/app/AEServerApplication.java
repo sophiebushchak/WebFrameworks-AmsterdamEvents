@@ -4,14 +4,14 @@ import app.models.AEvent;
 import app.models.Registration;
 import app.models.helper.AEventStatus;
 import app.models.helper.StringGenerator;
-import app.repositories.AEventsRepository;
+import app.repositories.interfaces.AEventsRepository;
 import app.repositories.RegistrationsRepositoryJPA;
+import app.repositories.interfaces.EntityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,11 +20,10 @@ import java.util.List;
 public class AEServerApplication implements CommandLineRunner {
 
   @Autowired
-  AEventsRepository aEventRepo;
+  EntityRepository<AEvent> aEventRepo;
+
   @Autowired
-  RegistrationsRepositoryJPA regRepo;
-  @Autowired
-  EntityManager entityManager;
+  EntityRepository<Registration> regRepo;
 
   public static void main(String[] args) {
     SpringApplication.run(AEServerApplication.class, args);

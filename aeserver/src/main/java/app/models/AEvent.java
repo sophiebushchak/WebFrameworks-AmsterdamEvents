@@ -1,5 +1,6 @@
 package app.models;
 
+import app.models.interfaces.Identifiable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -14,7 +15,7 @@ import java.util.Random;
 
 @Entity
 @NamedQuery(name = "find_all_aevents", query = "SELECT e FROM AEvent e")
-public class AEvent {
+public class AEvent implements Identifiable {
   @JsonView(UserViews.OnlyIdTitleStatus.class)
   @Id
   @GeneratedValue

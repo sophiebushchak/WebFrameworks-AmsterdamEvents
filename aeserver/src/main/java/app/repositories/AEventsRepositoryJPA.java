@@ -1,11 +1,12 @@
 package app.repositories;
 
 import app.models.AEvent;
-import org.springframework.beans.factory.annotation.Autowired;
+import app.repositories.interfaces.AEventsRepository;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.util.List;
@@ -13,8 +14,14 @@ import java.util.List;
 @Primary
 @Repository
 @Transactional
-public class AEventsRepositoryJPA implements AEventsRepository {
-  @Autowired
+public class AEventsRepositoryJPA extends AbstractEntityRepositoryJPA<AEvent> {
+  public AEventsRepositoryJPA() {
+    super(AEvent.class);
+  }
+}
+
+/*
+  @PersistenceContext
   EntityManager entityManager;
 
   @Override
@@ -43,3 +50,4 @@ public class AEventsRepositoryJPA implements AEventsRepository {
     return true;
   }
 }
+*/
