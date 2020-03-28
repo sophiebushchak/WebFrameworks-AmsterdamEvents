@@ -35,19 +35,28 @@ import java.util.Random;
 public class AEvent implements Identifiable {
   @Id
   @GeneratedValue
+  @JsonView({CustomJson.Shallow.class})
   private long id;
 
+  @JsonView({CustomJson.Shallow.class})
   private String title;
 
   private String description;
 
+  @JsonView({CustomJson.Shallow.class})
   @Enumerated(EnumType.STRING)
   private AEventStatus status;
 
+  @JsonView({CustomJson.Summary.class})
   private boolean isTicketed;
+
   private double participationFee;
+
   private int maxParticipants;
+
+  @JsonView({CustomJson.Summary.class})
   private LocalDate start;
+
   private LocalDate end;
 
   @JsonView({CustomJson.Summary.class})
@@ -84,7 +93,6 @@ public class AEvent implements Identifiable {
     registration.setAssociatedAEvent(null);
   }
 
-  @JsonIgnore
   public List<Registration> getRegistrations() {
     return registrations;
   }

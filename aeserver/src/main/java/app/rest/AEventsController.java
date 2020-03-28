@@ -2,28 +2,26 @@ package app.rest;
 
 import app.models.Registration;
 import app.models.helper.AEventStatus;
+import app.models.helper.CustomJson;
 import app.models.helper.StringGenerator;
-import app.repositories.interfaces.AEventsRepository;
-import app.repositories.RegistrationsRepositoryJPA;
 import app.repositories.interfaces.EntityRepository;
 import app.rest.exceptions.ForregistrationdenException;
 import app.rest.exceptions.PreconditionFailedException;
-import com.fasterxml.jackson.annotation.JsonView;
 import app.models.AEvent;
-import app.models.helper.UserViews;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
+
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.servlet.http.HttpServletRequest;
+
 import java.net.URI;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +33,7 @@ public class AEventsController {
   @Autowired
   private EntityRepository<Registration> registrationsRepository;
 
-
+  @JsonView(CustomJson.Summary.class)
   @GetMapping("/aevents")
   public List<AEvent> getAllAEvents(@RequestParam Map<String,String> params) {
     if (params.size() == 0) {
@@ -131,5 +129,34 @@ public class AEventsController {
     }
     newRegistration = registrationsRepository.save(newRegistration);
     return registrationsRepository.findById(newRegistration.getId());
+  }
+
+  @GetMapping("/aevents/{id}/registrations")
+  public List<Registration> getRegistrationsOfEvent(@PathVariable int id) {
+    AEvent foundEvent = this.getAEvent(id);
+    if (foundEvent.getStatus() != AEventStatus.PUBLISHED) {
+      throw new PreconditionFailedException("AEvent with aEventId=" + foundEvent.getId() + " is not published yet and " +
+        "thus has no registrations.");
+    }
+    if (foundEvent.getRegistrations().size() < 1) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event with id=" + id + " " +
+        "does not have any registrations associated with it.");
+    }
+    return foundEvent.getRegistrations();
+  }
+
+  @JsonView(CustomJson.Summary.class)
+  @GetMapping("/aevents/{eventId}/registrations/{registrationId}")
+  public Registration getRegistrationOfEventById(@PathVariable int eventId, @PathVariable int registrationId) {
+    List<Registration> listOfRegistrations = getRegistrationsOfEvent(eventId);
+    Registration foundRegistration = listOfRegistrations.stream()
+      .filter(Registration -> Registration.getId() == registrationId)
+      .findFirst()
+      .orElse(null);
+    if (foundRegistration == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Registration with id=" + registrationId +
+        " was not found on AEvent with id=" + eventId + ".");
+    }
+    return foundRegistration;
   }
 }

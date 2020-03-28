@@ -1,6 +1,9 @@
 package app.models;
 
+import app.models.helper.CustomJson;
 import app.models.interfaces.Identifiable;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -9,11 +12,18 @@ import java.time.LocalDateTime;
 public class Registration implements Identifiable {
   @Id
   @GeneratedValue
+  @JsonView({CustomJson.Shallow.class})
   private long id;
+
   private String ticketCode;
+
   private boolean paid;
+
+  @JsonView({CustomJson.Shallow.class})
   private LocalDateTime submissionDate;
 
+  @JsonView({CustomJson.Summary.class})
+  @JsonSerialize(using = CustomJson.ShallowSerializer.class)
   @ManyToOne
   private AEvent associatedAEvent;
 
