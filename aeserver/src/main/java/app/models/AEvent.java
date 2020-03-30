@@ -35,33 +35,33 @@ import java.util.Random;
 public class AEvent implements Identifiable {
   @Id
   @GeneratedValue
-  @JsonView({CustomJson.Shallow.class})
+  @JsonView(CustomJson.Shallow.class)
   private long id;
 
-  @JsonView({CustomJson.Shallow.class})
+  @JsonView(CustomJson.Shallow.class)
   private String title;
 
   private String description;
 
-  @JsonView({CustomJson.Shallow.class})
   @Enumerated(EnumType.STRING)
+  @JsonView(CustomJson.Shallow.class)
   private AEventStatus status;
 
-  @JsonView({CustomJson.Summary.class})
+  @JsonView(CustomJson.Summary.class)
   private boolean isTicketed;
 
+  @JsonView(CustomJson.Summary.class)
   private double participationFee;
 
   private int maxParticipants;
 
-  @JsonView({CustomJson.Summary.class})
+  @JsonView(CustomJson.Summary.class)
   private LocalDate start;
 
   private LocalDate end;
 
-  @JsonView({CustomJson.Summary.class})
-  @JsonSerialize(using = CustomJson.ShallowSerializer.class)
   @OneToMany(mappedBy = "associatedAEvent", fetch = FetchType.LAZY)
+  @JsonSerialize(using = CustomJson.ShallowSerializer.class)
   private List<Registration> registrations = new ArrayList<>();
 
   public AEvent() {
@@ -130,6 +130,7 @@ public class AEvent implements Identifiable {
   }
 
 
+
   @JsonProperty(value = "isTicketed")
   public boolean isTicketed() {
     return isTicketed;
@@ -138,6 +139,7 @@ public class AEvent implements Identifiable {
   public void setTicketed(boolean isTicketed) {
     this.isTicketed = isTicketed;
   }
+
 
   public double getParticipationFee() {
     return participationFee;

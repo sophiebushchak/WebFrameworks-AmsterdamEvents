@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.web.server.ResponseStatusException;
@@ -33,48 +34,53 @@ public class AEventsController {
   @Autowired
   private EntityRepository<Registration> registrationsRepository;
 
-  @JsonView(CustomJson.Summary.class)
+  //SummaryView
   @GetMapping("/aevents")
-  public List<AEvent> getAllAEvents(@RequestParam Map<String,String> params) {
+  public MappingJacksonValue getAllAEvents(@RequestParam Map<String, String> params) {
+    List<AEvent> result = null;
     if (params.size() == 0) {
-      return repository.findAll();
-    }
-    if (params.size() > 1) {
+      result = repository.findAll();
+    } else if (params.size() > 1) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can only handle one request parameter: title=, status= or minRegistrations=");
-    }
-    if (params.containsKey("title")) {
+    } else if (params.containsKey("title")) {
       String value = params.get("title");
-      return repository.findByQuery("AEvent_find_by_title", ("%" + value + "%"));
-    }
-    if (params.containsKey("status")) {
+      result =  repository.findByQuery("AEvent_find_by_title", ("%" + value + "%"));
+    } else if (params.containsKey("status")) {
       String stringValue = params.get("status").toUpperCase();
       for (AEventStatus e : AEventStatus.values()) {
         if (e.name().equals(stringValue)) {
           AEventStatus value = AEventStatus.valueOf(stringValue);
-          return repository.findByQuery("AEvent_find_by_status", value);
+          result =  repository.findByQuery("AEvent_find_by_status", value);
         }
       }
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "status=" + stringValue + " is not a valid AEvent status value.");
-    }
-    if (params.containsKey("minRegistrations")) {
+      if (result == null) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "status=" + stringValue + " is not a valid AEvent status value.");
+      }
+    } else if (params.containsKey("minRegistrations")) {
       int value;
       try {
         value = Integer.parseInt(params.get("minRegistrations"));
       } catch (NumberFormatException e) {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Provided request parameter was not a valid number.");
       }
-      return repository.findByQuery("AEvent_find_by_minRegistrations", value);
+      result =  repository.findByQuery("AEvent_find_by_minRegistrations", value);
     }
-    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid query parameters.");
+    if (result == null) {
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid query parameters.");
+    }
+    MappingJacksonValue value = new MappingJacksonValue(result);
+    value.setSerializationView(CustomJson.Summary.class);
+    return value;
   }
 
+  //UnrestrictedView
   @GetMapping("/aevents/{id}")
-  public AEvent getAEvent(@PathVariable int id) {
+  public MappingJacksonValue getAEvent(@PathVariable int id) {
     AEvent foundEvent = repository.findById(id);
     if (foundEvent == null) {
       throw new ResourceNotFoundException("Could not find AEvent with id: " + id);
     } else {
-      return foundEvent;
+      return new MappingJacksonValue(foundEvent);
     }
   }
 
@@ -114,11 +120,14 @@ public class AEventsController {
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping("/aevents/{id}/register")
   public Registration createNewRegistration(@RequestBody(required = false) LocalDateTime startDateTime, @PathVariable int id) {
-    AEvent foundEvent = this.getAEvent(id);
+    AEvent foundEvent = repository.findById(id);
+    if (foundEvent == null) {
+      throw new ResourceNotFoundException("Could not find AEvent with id: " + id);
+    }
     Registration newRegistration = new Registration();
     newRegistration.setTicketCode(StringGenerator.generateRandomString());
     newRegistration.setPaid(false);
-    if(startDateTime == null) {
+    if (startDateTime == null) {
       newRegistration.setSubmissionDate(LocalDateTime.now());
     } else {
       newRegistration.setSubmissionDate(startDateTime);
@@ -131,9 +140,14 @@ public class AEventsController {
     return registrationsRepository.findById(newRegistration.getId());
   }
 
+  //SummaryView
+  @JsonSerialize(using = CustomJson.SummarySerializer.class)
   @GetMapping("/aevents/{id}/registrations")
-  public List<Registration> getRegistrationsOfEvent(@PathVariable int id) {
-    AEvent foundEvent = this.getAEvent(id);
+  public MappingJacksonValue getRegistrationsOfEvent(@PathVariable int id) {
+    AEvent foundEvent = repository.findById(id);
+    if (foundEvent == null) {
+      throw new ResourceNotFoundException("Could not find AEvent with id: " + id);
+    }
     if (foundEvent.getStatus() != AEventStatus.PUBLISHED) {
       throw new PreconditionFailedException("AEvent with aEventId=" + foundEvent.getId() + " is not published yet and " +
         "thus has no registrations.");
@@ -142,13 +156,27 @@ public class AEventsController {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event with id=" + id + " " +
         "does not have any registrations associated with it.");
     }
-    return foundEvent.getRegistrations();
+    MappingJacksonValue value = new MappingJacksonValue(foundEvent.getRegistrations());
+    value.setSerializationView(CustomJson.Summary.class);
+    return value;
   }
 
-  @JsonView(CustomJson.Summary.class)
+  //UnrestrictedView
   @GetMapping("/aevents/{eventId}/registrations/{registrationId}")
-  public Registration getRegistrationOfEventById(@PathVariable int eventId, @PathVariable int registrationId) {
-    List<Registration> listOfRegistrations = getRegistrationsOfEvent(eventId);
+  public MappingJacksonValue getRegistrationOfEventById(@PathVariable int eventId, @PathVariable int registrationId) {
+    AEvent foundEvent = repository.findById(eventId);
+    if (foundEvent == null) {
+      throw new ResourceNotFoundException("Could not find AEvent with id: " + eventId);
+    }
+    if (foundEvent.getStatus() != AEventStatus.PUBLISHED) {
+      throw new PreconditionFailedException("AEvent with aEventId=" + foundEvent.getId() + " is not published yet and " +
+        "thus has no registrations.");
+    }
+    if (foundEvent.getRegistrations().size() < 1) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Event with id=" + eventId + " " +
+        "does not have any registrations associated with it.");
+    }
+    List<Registration> listOfRegistrations = foundEvent.getRegistrations();
     Registration foundRegistration = listOfRegistrations.stream()
       .filter(Registration -> Registration.getId() == registrationId)
       .findFirst()
@@ -157,6 +185,6 @@ public class AEventsController {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Registration with id=" + registrationId +
         " was not found on AEvent with id=" + eventId + ".");
     }
-    return foundRegistration;
+    return new MappingJacksonValue(foundRegistration);
   }
 }

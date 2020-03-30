@@ -15,14 +15,11 @@ public class CustomJson {
   public static class Summary extends Shallow {
   }
 
-  public static class Unrestricted extends Summary {
-
-  }
-
   public static class ShallowSerializer extends JsonSerializer<Object> {
     @Override
     public void serialize(Object object, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
       throws IOException, JsonProcessingException {
+      System.out.println("Serializing with shallow serializer..");
       ObjectMapper mapper = new ObjectMapper()
         .configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false)
         .setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -41,6 +38,7 @@ public class CustomJson {
     @Override
     public void serialize(Object object, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
       throws IOException, JsonProcessingException {
+      System.out.println("Serializing with summary serializer..");
       ObjectMapper mapper = new ObjectMapper()
         .configure(MapperFeature.DEFAULT_VIEW_INCLUSION, false)
         .setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -48,7 +46,8 @@ public class CustomJson {
       mapper.registerModule(new JavaTimeModule())
         .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
-      mapper.setConfig(mapper.getSerializationConfig().withView(CustomJson.Summary.class));
+      mapper.setConfig(mapper.getSerializationConfig()
+        .withView(CustomJson.Summary.class));
 
       jsonGenerator.setCodec(mapper);
       jsonGenerator.writeObject(object);
@@ -59,14 +58,13 @@ public class CustomJson {
     @Override
     public void serialize(Object object, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
       throws IOException, JsonProcessingException {
+      System.out.println("Serializing with unrestricted serializer..");
       ObjectMapper mapper = new ObjectMapper()
         .configure(MapperFeature.DEFAULT_VIEW_INCLUSION, true)
         .setSerializationInclusion(JsonInclude.Include.ALWAYS);
 
       mapper.registerModule(new JavaTimeModule())
         .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-
-      mapper.setConfig(mapper.getSerializationConfig().withView(CustomJson.Unrestricted.class));
 
       jsonGenerator.setCodec(mapper);
       jsonGenerator.writeObject(object);
