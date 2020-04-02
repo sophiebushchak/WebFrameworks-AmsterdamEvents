@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {SessionService} from '../../../services/session-service';
+import {User} from '../../../models2/user.model';
 
 @Component({
   selector: 'app-header2',
@@ -8,19 +9,19 @@ import {SessionService} from '../../../services/session-service';
   styleUrls: ['./header2.component.css']
 })
 export class Header2Component implements OnInit {
-  signedInUsername: string;
-  signedInUsernameSubscription: Subscription;
+  signedInUser: User;
+  signedInUserSubscription;
 
   constructor(public sessionService: SessionService) {
   }
 
   ngOnInit(): void {
-    this.signedInUsernameSubscription =
-      this.sessionService.usernameEmitter.subscribe(
-        (username: string) => {
-          this.signedInUsername = username;
-        }
-      );
+    this.signedInUserSubscription = this.sessionService.currentUserEmitter.subscribe(
+      (currentUser) => {
+        this.signedInUser = currentUser;
+      }
+    );
+    this.sessionService.transmitUser();
   }
 
   retrieveDate(): string {

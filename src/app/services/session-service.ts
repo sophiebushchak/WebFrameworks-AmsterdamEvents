@@ -1,51 +1,93 @@
 import {EventEmitter, Injectable} from '@angular/core';
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
+import {HttpClient, HttpResponse} from '@angular/common/http';
+import {User} from '../models2/user.model';
+import {JwtHelperService} from '@auth0/angular-jwt';
+import {share} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SessionService {
-  public username: string;
-  public usernameEmitter = new EventEmitter<string>();
-  private token: string;
+  readonly REST_BASE_URL: string;
+  private currentUser: User;
+  public currentUserEmitter = new EventEmitter<User>();
+  public currentToken: string;
 
-  public signIn(email: string, password: string) {
-    firebase.auth().signInWithEmailAndPassword(email, password)
-      .then(
-        () => {
-          this.username = email;
-          this.usernameEmitter.emit(this.username);
+  jwtService = new JwtHelperService();
+
+  constructor(private httpClient: HttpClient) {
+    this.REST_BASE_URL = 'http://localhost:8084/';
+    this.updateUserInformation();
+    console.log(this.currentUser);
+  }
+
+  public signIn(eMail: string, passWord: string) {
+    const observable = this.httpClient.post(this.REST_BASE_URL + '/authenticate/login', {
+      email: eMail,
+      password: passWord
+    }, {observe: 'response'}).pipe(share());
+
+    observable.subscribe(
+      data => {
+        console.log('logged in' + data);
+        let token = data.headers.get('Authorization');
+
+        if (token == null) {
+          throw new Error('Token was not present in the response');
         }
-      ).catch(
-      (error) => {
-        alert(error.message);
+
+        token = token.replace('Bearer ', '');
+
+        sessionStorage.setItem('token', token);
+
+        this.updateUserInformation();
+      },
+      error => {
+        console.log('Authentication error: ' + error);
+        this.currentUser = null;
+        this.currentToken = null;
       }
     );
+    return observable;
+  }
+
+  transmitUser() {
+    this.currentUserEmitter.emit(this.currentUser);
   }
 
   public signOut() {
-    firebase.auth().signOut()
-      .then(
-        (response) => console.log(response)
-      );
-    this.username = null;
-    this.usernameEmitter.emit(this.username);
+    sessionStorage.removeItem('token');
+    this.updateUserInformation();
   }
 
-  getToken() {
-    if (this.username != null) {
-      firebase.auth().currentUser.getIdToken()
-        .then(
-          (token: string) => this.token = token
-        );
-    } else {
-      this.token = null;
+  isLoggedIn() {
+    if (this.currentUser == null) {
+      return false;
     }
-    return this.token;
+
+    const expirationDate: number = this.jwtService.getTokenExpirationDate(this.currentToken).getTime();
+    const currentTime: number = new Date().getTime();
+
+    return expirationDate > currentTime;
   }
 
-  constructor() {
+  private updateUserInformation() {
+    this.currentToken = sessionStorage.getItem('token');
+
+    if (this.currentToken) {
+      const decodedToken = this.jwtService.decodeToken(this.currentToken);
+
+      this.currentUser = new User();
+      this.currentUser.name = decodedToken.sub;
+      this.currentUser.id = decodedToken.id;
+      this.currentUser.admin = decodedToken.admin;
+
+    } else {
+      this.currentUser = null;
+    }
+    this.currentUserEmitter.emit(this.currentUser);
   }
 
 

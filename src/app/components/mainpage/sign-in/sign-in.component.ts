@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {NgForm} from '@angular/forms';
 import {SessionService} from '../../../services/session-service';
 import {Router} from '@angular/router';
@@ -10,7 +10,8 @@ import {Router} from '@angular/router';
 })
 export class SignInComponent implements OnInit {
 
-  constructor(public sessionService: SessionService, public router: Router) { }
+  constructor(public sessionService: SessionService, public router: Router) {
+  }
 
   ngOnInit(): void {
   }
@@ -18,7 +19,13 @@ export class SignInComponent implements OnInit {
   onSignIn(form: NgForm) {
     const username = form.value.username;
     const password = form.value.password;
-    this.sessionService.signIn(username, password);
+    this.sessionService.signIn(username, password).subscribe(
+      () => {
+        if (this.sessionService.isLoggedIn()) {
+          this.router.navigate(['/']);
+        }
+      }
+  );
   }
 
 }

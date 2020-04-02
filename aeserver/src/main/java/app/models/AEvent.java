@@ -60,7 +60,7 @@ public class AEvent implements Identifiable {
 
   private LocalDate end;
 
-  @OneToMany(mappedBy = "associatedAEvent", fetch = FetchType.LAZY)
+  @OneToMany(mappedBy = "associatedAEvent", fetch = FetchType.LAZY, orphanRemoval = true)
   @JsonSerialize(using = CustomJson.ShallowSerializer.class)
   private List<Registration> registrations = new ArrayList<>();
 

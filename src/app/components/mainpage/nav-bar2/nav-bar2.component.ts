@@ -9,17 +9,18 @@ import {Router} from '@angular/router';
   styleUrls: ['./nav-bar2.component.css']
 })
 export class NavBar2Component implements OnInit {
-  constructor(public sessionService: SessionService) {
+  constructor(public sessionService: SessionService, public router: Router) {
   }
 
   ngOnInit(): void {
   }
 
   isSignedIn(): boolean {
-    return this.sessionService.username != null;
+    return this.sessionService.isLoggedIn();
   }
 
   signOut() {
     this.sessionService.signOut();
+    this.router.navigate(['/']);
   }
 }

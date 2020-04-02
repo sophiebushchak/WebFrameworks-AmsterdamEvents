@@ -6,7 +6,7 @@
     <h1 class="display-4">Amsterdam Events</h1>
     <div class="d-flex">
       <p class="mr-auto ml-5 lead">Today is {{ retrieveDate() }}</p>
-      <p class="ml-auto mr-5 lead">Welcome <span id="signedInUsername"> {{ signedInUsername == null ? 'Visitor' : signedInUsername }}</span></p>
+      <p class="ml-auto mr-5 lead">Welcome <span id="signedInUsername"> {{ signedInUser == null ? 'Visitor' : signedInUser.name }}</span></p>
     </div>
   </div>
   <div class="d-none d-lg-block col-lg-2">
