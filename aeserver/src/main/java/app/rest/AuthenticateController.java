@@ -1,6 +1,11 @@
 package app.rest;
 
+import app.repositories.interfaces.EntityRepository;
+import app.rest.security.JWToken;
+import app.rest.security.PasswordEncoder;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,8 +20,12 @@ import javax.persistence.PersistenceContext;
 
 @RestController
 public class AuthenticateController {
-  @PersistenceContext
-  EntityManager em;
+  @Autowired
+  EntityRepository<User> userRepo;
+  @Autowired
+  private JWToken tokenGenerator;
+  @Autowired
+  private PasswordEncoder encoder;
 
   @PostMapping("/authenticate/login")
   public ResponseEntity<User> login(@RequestBody ObjectNode emailAndPassword) {
@@ -29,7 +38,13 @@ public class AuthenticateController {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Cannot authenticate user by email=" + email +
         " and password=" + password);
     }
-    User createdUser = new User(email, password);
-    return ResponseEntity.status(HttpStatus.ACCEPTED).body(createdUser);
+
+    User user = new User(email);
+
+    String tokenString = tokenGenerator.encode(user.getName(), user.getId(), user.isAdmin());
+    return ResponseEntity
+      .status(HttpStatus.ACCEPTED)
+      .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenString)
+      .body(user);
   }
 }

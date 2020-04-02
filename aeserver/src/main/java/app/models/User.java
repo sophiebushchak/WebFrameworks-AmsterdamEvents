@@ -1,5 +1,6 @@
 package app.models;
 
+import app.models.interfaces.Identifiable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 
@@ -7,24 +8,29 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import static java.lang.String.valueOf;
+
 @Entity
-public class User {
+public class User implements Identifiable {
   @Id
   private long id;
+
   private String name;
+
   private String email;
+
   @JsonIgnore
   private String hashedPassword;
+
   private boolean admin;
 
   public User() {
   }
 
-  public User(String email, String hashedPassword) {
+  public User(String email) {
     this.id = Math.abs(email.hashCode());
     this.email = email;
     this.name = email.split("@")[0];
-    this.hashedPassword = hashedPassword;
   }
 
   public long getId() {
