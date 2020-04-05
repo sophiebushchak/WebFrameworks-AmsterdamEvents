@@ -75,12 +75,12 @@ public class AEventsController {
 
   //UnrestrictedView
   @GetMapping("/aevents/{id}")
-  public MappingJacksonValue getAEvent(@PathVariable int id) {
+  public AEvent getAEvent(@PathVariable int id) {
     AEvent foundEvent = repository.findById(id);
     if (foundEvent == null) {
       throw new ResourceNotFoundException("Could not find AEvent with id: " + id);
     } else {
-      return new MappingJacksonValue(foundEvent);
+      return foundEvent;
     }
   }
 
@@ -141,7 +141,6 @@ public class AEventsController {
   }
 
   //SummaryView
-  @JsonSerialize(using = CustomJson.SummarySerializer.class)
   @GetMapping("/aevents/{id}/registrations")
   public MappingJacksonValue getRegistrationsOfEvent(@PathVariable int id) {
     AEvent foundEvent = repository.findById(id);
@@ -163,7 +162,7 @@ public class AEventsController {
 
   //UnrestrictedView
   @GetMapping("/aevents/{eventId}/registrations/{registrationId}")
-  public MappingJacksonValue getRegistrationOfEventById(@PathVariable int eventId, @PathVariable int registrationId) {
+  public Registration getRegistrationOfEventById(@PathVariable int eventId, @PathVariable int registrationId) {
     AEvent foundEvent = repository.findById(eventId);
     if (foundEvent == null) {
       throw new ResourceNotFoundException("Could not find AEvent with id: " + eventId);
@@ -185,6 +184,6 @@ public class AEventsController {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Registration with id=" + registrationId +
         " was not found on AEvent with id=" + eventId + ".");
     }
-    return new MappingJacksonValue(foundRegistration);
+    return foundRegistration;
   }
 }

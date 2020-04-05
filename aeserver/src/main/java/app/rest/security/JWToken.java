@@ -12,7 +12,6 @@ import java.util.Date;
 
 @Component
 public class JWToken {
-  // A claim indicating if the user is an administrator
   private static final String JWT_USERNAME_CLAIM = "sub";
   private static final String JWT_USERID_CLAIM = "id";
   private static final String JWT_ADMIN_CLAIM = "admin";
@@ -33,32 +32,21 @@ public class JWToken {
     String token = Jwts.builder()
       .claim(JWT_USERNAME_CLAIM, username)
       .claim(JWT_USERID_CLAIM, Long.toString(userid))
-      .claim(JWT_ADMIN_CLAIM, Boolean.toString(admin)) // public claim
-      .setIssuer(issuer) // registered claim
-      .setIssuedAt(new Date()) // registered claim
-      .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000)) // registered claim
+      .claim(JWT_ADMIN_CLAIM, Boolean.toString(admin))
+      .setIssuer(issuer)
+      .setIssuedAt(new Date())
+      .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000))
       .signWith(key, SignatureAlgorithm.HS512)
       .compact();
     return token;
   }
 
-  /**
-   * Get the secret key
-   * @param passPhrase
-   * @return
-   */
   private Key getKey(String passPhrase) {
     byte hmacKey[] = passPhrase.getBytes(StandardCharsets.UTF_8);
     Key key = new SecretKeySpec(hmacKey, SignatureAlgorithm.HS512.getJcaName());
     return key;
   }
 
-  /**
-   * Decode the given token, returning an object with useful token data
-   * @param encodedToken
-   * @return
-   * @throws AuthenticationException for expired, malformed tokens
-   */
   public JWTokenInfo decode(String encodedToken) throws AuthenticationException {
     try {
       // Validate the token
